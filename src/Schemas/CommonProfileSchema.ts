@@ -38,10 +38,6 @@ const commonProfile =new Schema<ICommonProfile>({
         type:Date,
         default:new Date()
     },
-    verified:{
-        type:Boolean,
-        default:false
-    },
     firebase_id:{
         type:String,
         required:true
