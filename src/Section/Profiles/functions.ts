@@ -15,8 +15,6 @@ export async function addIfProfileNotExist(data: ICommonProfile,firebase_id:stri
             console.log(res2)
             throw new Error(`Already Exist With Same Number Plz Change Number`)
         }
-        console.log(res2)
-        console.log(res)
         throw new Error(`Already Exist`)
     } catch (error) {
         console.log("error on isProfileExist", error)
