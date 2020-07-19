@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "nodemon ./src/index.ts",
-    "build": "babel src/ --out-dir bin/",
+    "build": "tsc -p .",
     "start": "node ./bin/index"
   },
   "author": "Vishnu Suresh (DoCZ)",

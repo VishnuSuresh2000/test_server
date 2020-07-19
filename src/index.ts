@@ -43,7 +43,7 @@ app.get('/test', (_req: Request, res: Response) => {
 
 
 
-var server=app.listen(80, () => {
+var server=app.listen(process.env.PORT, () => {
     console.log("http://localhost:80") 
     changeState.on("data",(chunk)=>{
         console.log(`From Stream ${chunk}`)

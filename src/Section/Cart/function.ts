@@ -78,8 +78,6 @@ export async function createCart(data: Icart) {
                 throw new Error('The product need is higher than the list')
             } else if (custom == null) {
                 throw new Error('Invalid Customer')
-            } else if (!custom.verified) {
-                throw new Error('Account is Not Verified')
             } else if (data.count == null || data.count == 0) {
                 throw new Error('Count of the Product Must Define')
             } else {

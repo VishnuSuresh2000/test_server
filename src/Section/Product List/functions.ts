@@ -92,8 +92,6 @@ export async function addToProductList(data: IProductList) {
                 throw new Error('Product Not Exist')
             } else if (sell == null) {
                 throw new Error('Seller Not Exist')
-            }else if(sell.isVerified==null || !sell.isVerified){
-                throw new Error('Seller Not Varified')
             } else if (far == null) {
                 throw new Error('Farmer Not Exist')
             } else {
