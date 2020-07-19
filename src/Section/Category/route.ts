@@ -1,8 +1,7 @@
-import { Router, Request, Response } from 'express'
-import category from '../../Schemas/category'
-import CRUD from '../../DataBase/crud'
-import { outFunction } from '../functions'
-import JSONStream from "jsonstream";
+import { Request, Response, Router } from 'express';
+import CRUD from '../../DataBase/crud';
+import category from '../../Schemas/category';
+import { outFunction } from '../functions';
 var crudCategory: CRUD = new CRUD(category)
 
 var route_category = Router()
