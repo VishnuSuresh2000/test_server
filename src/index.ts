@@ -1,11 +1,9 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import express, { Application, Request, Response } from 'express'
-import { Duplex, Stream } from 'stream'
 import WebSocket from 'ws'
 import changeState from './CustomStream/CheckDataChaged'
 import dbconnection from './DataBase/connection'
-import category from './Schemas/category'
 import route_category from './Section/Category/route'
 import customer from "./Section/Profiles/Customer/route"
 

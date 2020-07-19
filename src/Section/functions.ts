@@ -4,7 +4,6 @@ export async function outFunction(res: Response, callBackFunction: Function) {
     
     try {
         let temp=await callBackFunction()
-        
         res.send({
             data: temp
         })
