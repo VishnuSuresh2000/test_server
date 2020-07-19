@@ -4,7 +4,9 @@
   "description": "Server of beru software",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "nodemon ./src/index.ts"
+    "dev": "nodemon ./src/index.ts",
+    "build": "babel src/ --out-dir bin/",
+    "start": "node ./bin/index"
   },
   "author": "Vishnu Suresh (DoCZ)",
   "license": "ISC",
