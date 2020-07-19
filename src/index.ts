@@ -34,6 +34,11 @@ app.use('/category', route_category)
 //     console.log(res.locals.test)
 //     res.send("token test section")
 // })
+app.get('/', (_req: Request, res: Response) => {
+    res.send("Test Sections")
+})
+
+
 
 app.get('/test', (_req: Request, res: Response) => {
     res.send("test section")
