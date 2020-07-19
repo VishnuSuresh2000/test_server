@@ -1,8 +1,8 @@
 import { Stream } from "stream";
 
-var changeState =new Stream.Readable({
-    
+var changeState = new Stream.Readable({
+
 })
-changeState._read=()=>{}
+changeState._read = () => { }
 
 export default changeState

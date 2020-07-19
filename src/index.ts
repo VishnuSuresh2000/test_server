@@ -40,17 +40,14 @@ app.get('/', (_req: Request, res: Response) => {
 
 app.get('/test', (_req: Request, res: Response) => {
     res.send("test section")
-    changeState.push("true")
 })
 
 
 
 
-var server=app.listen(process.env.PORT, () => {
+var server=app.listen(process.env.PORT||80, () => {
     console.log("http://localhost:80") 
-    changeState.on("data",(chunk)=>{
-        console.log(`From Stream ${chunk}`)
-    })
+    
 })
 
 var socket = new WebSocket.Server({server:server,path:'/test'},)
@@ -61,9 +58,12 @@ socket.on('connection',async  function connection(ws) {
         
     });
     console.log("connected client")
-    setInterval(()=>{
-        num=num+1
-        ws.send(`from time interval step `)
-    },1000)
-    
+    // setInterval(()=>{
+    //     num=num+1
+    //     ws.send(`from time interval step `)
+    // },1000)
+    changeState.on("data",(chunk)=>{
+        
+        ws.send(`From Stream ${chunk}`)
+    })
 });
