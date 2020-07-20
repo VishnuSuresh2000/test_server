@@ -11,5 +11,6 @@ export default interface ICommonProfile extends Document {
     active:boolean,
     userCreation:Date,
     lastLogin:Date,
-    firebase_id:string
+    firebase_id:string,
+    isVerified:boolean
 }

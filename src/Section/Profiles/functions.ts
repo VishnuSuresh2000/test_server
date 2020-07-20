@@ -3,11 +3,12 @@ import ICommonProfile from "../../Schemas/Schema Interface/ICommonProfile";
 
 export async function addIfProfileNotExist(data: ICommonProfile,firebase_id:string, model: Model<ICommonProfile>) {
     try {
-        data.firebase_id=firebase_id
+        // data.firebase_id=firebase_id
         console.log(firebase_id,"from function","\n",data)
-        let res = await model.findOne({ firebase_id: data.firebase_id })
+        // let res = await model.findOne({ firebase_id: data.firebase_id })
         let res2 = await model.findOne({ phoneNumber: data.phoneNumber })
-        if (res == null && res2 == null) {
+        //res == null &&
+        if ( res2 == null) {
             let temp = new model(data)
             await temp.save()
             return "Added Profile"
@@ -19,7 +20,6 @@ export async function addIfProfileNotExist(data: ICommonProfile,firebase_id:stri
     } catch (error) {
         console.log("error on isProfileExist", error)
         throw `${error}`
-
     }
 }
 

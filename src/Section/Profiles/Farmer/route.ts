@@ -12,10 +12,10 @@ router_farmer.get('/',async(_req:Request,res:Response)=>{
     outFunction(res, async () => crudFarmer.read())
 })
 
-// router_farmer.post('/',async(req:Request,res:Response)=>{
-//     outFunction(res, async () =>addIfProfileNotExist(false,req.body,farmer) )
+router_farmer.post('/',async(req:Request,res:Response)=>{
+    outFunction(res, async () =>addIfProfileNotExist(req.body, res.locals.firebase_id,farmer) )
 
-// })
+})
 router_farmer.get('/:id',async(req:Request,res:Response)=>{
     outFunction(res, async () => crudFarmer.readSingleRecord(req.params.id))
 })

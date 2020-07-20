@@ -45,6 +45,10 @@ const commonProfile =new Schema<ICommonProfile>({
     sex:{
         type:Boolean,
         required:true
+    },
+    isVerified:{
+        type:Boolean,
+        default:true
     }
 })
 

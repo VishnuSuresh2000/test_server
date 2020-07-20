@@ -8,7 +8,7 @@ export default async function setUpWebSocket(server: Server) {
         console.log("connected client")
         changeState.on("data", (chunk) => {
             console.log(`From Stream ${chunk}`)
-            ws.send(chunk)
+            ws.send(`${chunk}`)
         })
     });
 }

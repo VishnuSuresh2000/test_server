@@ -12,10 +12,10 @@ router_seller.get('/',async(_req:Request,res:Response)=>{
     outFunction(res, async () => crudseller.read())
 })
 
-// router_seller.post('/',async(req:Request,res:Response)=>{
-//     outFunction(res, async () =>addIfProfileNotExist(false,req.body,seller) )
+router_seller.post('/',async(req:Request,res:Response)=>{
+    outFunction(res, async () =>addIfProfileNotExist(req.body, res.locals.firebase_id,seller) )
 
-// })
+})
 router_seller.get('/:id',async(req:Request,res:Response)=>{
     outFunction(res, async () => crudseller.readSingleRecord(req.params.id))
 })

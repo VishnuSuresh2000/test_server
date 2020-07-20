@@ -5,7 +5,10 @@ import dbconnection from './DataBase/connection'
 import route_category from './Section/Category/route'
 import customer from "./Section/Profiles/Customer/route"
 import setUpWebSocket from './WebSocket/websocket'
-
+import seller from "./Section/Profiles/Seller/route";
+import product from "./Section/Product/route"
+import farmer from "./Section/Profiles/Farmer/route";
+import productlist from "./Section/Product List/route";
 dbconnection()
 
 var app: Application = express()
@@ -25,7 +28,10 @@ app.use(bodyParser.json({
 }))
 app.use('/customer', customer)
 app.use('/category', route_category)
-
+app.use('/seller',seller)
+app.use('/product',product)
+app.use('/farmer',farmer)
+app.use('/productlist',productlist)
 
 app.get('/', (_req: Request, res: Response) => {
     res.send("Test Sections")
