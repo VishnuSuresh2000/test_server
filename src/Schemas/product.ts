@@ -1,15 +1,9 @@
-import {Schema,Document, model} from "mongoose"
+import { model, Schema } from "mongoose"
 import category from "./category"
+import salles from "./productlist"
+import IProduct from "./Schema Interface/IProduct"
 
-
-interface IProduct extends Document{
-    name:string,
-    description:string,
-    category:Schema.Types.ObjectId,
-    inKg:boolean
-}
-
-var product=new Schema({
+var product=new Schema<IProduct>({
     name:{
         type:String,
         required:true,
@@ -27,8 +21,10 @@ var product=new Schema({
     inKg:{
         type:Boolean,
         required:true
+    },
+    salles:{
+        type:[salles]
     }
-
 })
 
 export default model<IProduct>("Product",product)

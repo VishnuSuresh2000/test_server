@@ -1,20 +1,14 @@
-import { model, Schema } from "mongoose";
-import IProductList from "./Schema Interface/IProductList";
-import product from "./product";
+import { Schema } from "mongoose";
 import farmer from "./farmer";
+import ISalles from "./Schema Interface/IProductList";
 import seller from "./seller";
 
-var productList=new Schema({
-    product_id:{
-        type:Schema.Types.ObjectId,
-        ref:product,
-        required:true
-    },
+var salles=new Schema<ISalles>({
+    
     farmer_id:{
         type:Schema.Types.ObjectId,
         ref:farmer,
         required:true,
-
     },
     seller_id:{
         type:Schema.Types.ObjectId,
@@ -46,4 +40,4 @@ var productList=new Schema({
     }
 })
 
-export default model<IProductList>("ProductList",productList)
+export default salles
