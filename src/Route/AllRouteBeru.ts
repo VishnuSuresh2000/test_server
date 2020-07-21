@@ -5,7 +5,7 @@ import product from "../Section/Product/route"
 import farmer from "../Section/Profiles/Farmer/route";
 import { Application } from "express";
 import router_salles from '../Section/Salles/route';
-export default function allRoutes(app:Application) {
+export default function allRoutesBeru(app:Application) {
     app.use('/customer', customer)
     app.use('/category', route_category)
     app.use('/seller', seller)

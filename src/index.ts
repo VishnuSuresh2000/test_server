@@ -2,7 +2,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import express, { Application, Request, Response } from 'express'
 import dbconnection from './DataBase/connection'
-import allRoutes from './Route/Allroute'
+import allRoutesBeru from './Route/AllRouteBeru'
 import setUpWebSocket from './WebSocket/websocket'
 
 
@@ -22,7 +22,7 @@ app.use(cors({
 app.use(bodyParser.json({
     limit: '10mb'
 }))
-allRoutes(app)
+allRoutesBeru(app)
 
 app.get('/', (_req: Request, res: Response) => {
     res.send("Test Sections")
