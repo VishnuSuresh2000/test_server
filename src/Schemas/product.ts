@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose"
 import category from "./category"
-import salles from "./productlist"
+import salles from "./Salles"
 import IProduct from "./Schema Interface/IProduct"
 
 var product=new Schema<IProduct>({

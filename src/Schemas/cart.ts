@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import productlist from "./productlist";
+import productlist from "./Salles";
 import customer from "./customer";
 import Icart from "./Schema Interface/Icart";
 

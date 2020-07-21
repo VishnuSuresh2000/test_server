@@ -35,7 +35,7 @@ interface IProduct {
     inKg:boolean
 }
 
-async function isProductExist(idOrName: boolean, data: string) {
+export async function isProductExist(idOrName: boolean, data: string) {
     try {
         let temp = idOrName ? { _id: data } : { name: data.toLowerCase() }
         let res = await product.findOne(temp)

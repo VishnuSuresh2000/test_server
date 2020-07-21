@@ -28,7 +28,8 @@ var salles=new Schema<ISalles>({
         default:new Date()
     },
     dateOfUpdate:{
-        type:Date
+        type:Date,
+        default:new Date()
     },
     isVerified:{
         type:Boolean,

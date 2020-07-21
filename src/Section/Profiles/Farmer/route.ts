@@ -2,7 +2,7 @@ import farmer from "../../../Schemas/farmer";
 import { Router, Request,Response } from "express";
 import CRUD from "../../../DataBase/crud";
 import { outFunction } from "../../functions";
-import { addIfProfileNotExist, updateIfProfileNotExist, isPhoneNumberAlreadyExist } from "../functions";
+import { addIfProfileNotExist, updateIfProfileNotExist, isPhoneNumberAlreadyExist, varifyAccount } from "../functions";
 var crudFarmer: CRUD = new CRUD(farmer)
 
 var router_farmer=Router()
@@ -30,5 +30,7 @@ router_farmer.delete('/:id',async(req:Request,res:Response)=>{
 router_farmer.get('/phNoExist/:id',async(req:Request,res:Response)=>{
     outFunction(res, async () => isPhoneNumberAlreadyExist(+req.params.id,farmer))
 })
-
+router_farmer.put("/verify/:show",async(req:Request,res:Response)=>{
+    outFunction(res, async () => varifyAccount(req.body.id,JSON.parse(req.params.show),farmer))
+})
 export default router_farmer
