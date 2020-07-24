@@ -1,6 +1,7 @@
-import product from "../../Schemas/product";
 import category from "../../Schemas/category";
-import { Schema } from "mongoose";
+import product from "../../Schemas/product";
+import { ICategory } from "../../Schemas/Schema Interface/ICategory";
+import IProduct from "../../Schemas/Schema Interface/IProduct";
 
 export async function getAllProduct() {
     try {
@@ -27,13 +28,7 @@ interface InputProduct {
     inKg:boolean
 }
 
-interface IProduct {
-    _id?: string
-    name?: string,
-    description?: string,
-    category?: Schema.Types.ObjectId,
-    inKg:boolean
-}
+
 
 export async function isProductExist(idOrName: boolean, data: string) {
     try {
@@ -69,20 +64,22 @@ export async function addProduct(data: InputProduct) {
 }
 
 
-export async function updateProduct(id: string, data: InputProduct) {
+export async function updateProduct(id: string, data: IProduct) {
     try {
 
         let check = await isProductExist(true, id)
         if (check) {
-            let res = await category.findOne(data.category)
-            let temp: IProduct = {
-                name: data.name,
-                description: data.description,
-                category: res?._id,
-                _id: id,
-                inKg:data.inKg
-            }
-            await product.findByIdAndUpdate(id, temp);
+            let res = await category.findOne(data.category) as ICategory
+            await product.findByIdAndUpdate(id,
+                {
+                    name: data.name,
+                    description: data.description,
+                    category: res._id,
+                    _id: id,
+                    inKg:data.inKg,
+                    amount:data.amount
+                }
+            );
             return "Record Updated"
         }
         throw new Error("Record Not exist with same _id")
@@ -98,12 +95,13 @@ export async function readSingleProduct(id: string) {
         var response = await product.findOne({ _id: id })
         if (response != null) {
             let temp = await category.findById(response?.category);
-            let out: IProduct = {
+            let out = {
                 _id: response?._id,
                 name: response?.name,
                 category: temp?._id,
                 description: response?.description,
-                inKg:response.inKg
+                inKg:response.inKg,
+                amount:response.amount
             }
             return out
         }

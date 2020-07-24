@@ -1,10 +1,11 @@
-import { Schema,Document } from "mongoose";
-import ISalles from "./IProductList";
+import { Document, Types } from "mongoose";
+import ISalles from "./ISalles";
 
 export default interface IProduct extends Document{
     name:string,
     description:string,
-    category:Schema.Types.ObjectId,
+    category:Types.ObjectId,
     inKg:boolean,
+    amount:number,
     salles:Array<ISalles>
 }

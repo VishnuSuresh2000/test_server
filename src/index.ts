@@ -1,18 +1,19 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express, { Application, Request, Response } from 'express'
+import express, { Request, Response } from 'express'
+import expressWs from 'express-ws'
 import dbconnection from './DataBase/connection'
 import allRoutesBeru from './Route/AllRouteBeru'
-import setUpWebSocket from './WebSocket/websocket'
+import syncWebSocket from './WebSocket/websocket'
 
 
 dbconnection()
-
-var app: Application = express()
-var server=app.listen(process.env.PORT||80, () => {
-    console.log("http://localhost:80") 
+var wsApp=expressWs(express())
+var app = wsApp.app
+app.listen(process.env.PORT || 80, () => {
+    console.log("http://localhost:80")
 })
-setUpWebSocket(server)
+
 app.use(cors({
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
     credentials: true,
@@ -31,6 +32,9 @@ app.get('/', (_req: Request, res: Response) => {
 app.get('/test', (_req: Request, res: Response) => {
     res.send("test section")
 })
+
+syncWebSocket(app)
+
 
 
 

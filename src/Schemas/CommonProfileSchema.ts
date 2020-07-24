@@ -40,7 +40,7 @@ const commonProfile =new Schema<ICommonProfile>({
     },
     firebase_id:{
         type:String,
-        required:true
+        // required:true
     },
     sex:{
         type:Boolean,

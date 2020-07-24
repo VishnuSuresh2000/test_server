@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import farmer from "./farmer";
-import ISalles from "./Schema Interface/IProductList";
+import ISalles from "./Schema Interface/ISalles";
 import seller from "./seller";
 
 var salles=new Schema<ISalles>({
@@ -35,10 +35,7 @@ var salles=new Schema<ISalles>({
         type:Boolean,
         default:false
     },
-    amount:{
-        type:Number,
-        required:true
-    }
+    
 })
 
 export default salles

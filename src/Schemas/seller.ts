@@ -1,5 +1,5 @@
-import { model, Schema } from "mongoose";
-import ICommonProfile from "./Schema Interface/ICommonProfile";
+import { model } from "mongoose";
 import commonProfile from "./CommonProfileSchema";
+import ICommonProfile from "./Schema Interface/ICommonProfile";
 
 export default model<ICommonProfile>('Seller', commonProfile)

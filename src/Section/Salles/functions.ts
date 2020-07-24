@@ -1,17 +1,22 @@
+import { changeStateSyncSalles } from "../../CustomStream/CheckDataChaged";
 import farmer from "../../Schemas/farmer";
 import product from "../../Schemas/product";
-import ISalles from "../../Schemas/Schema Interface/IProductList";
+import ISalles from "../../Schemas/Schema Interface/ISalles";
 import seller from "../../Schemas/seller";
 import { isProductExist } from "../Product/functions";
+
+function listernChngesAndSync(){
+    changeStateSyncSalles.push("true")
+}
 
 export async function getAllSalles() {
     try {
         let temp = await product.find().populate({
             path: "salles.farmer_id",
-            select: "name"
+            select: "firstName lastName"
         }).populate({
             path: "salles.seller_id",
-            select: "name"
+            select: "firstName lastName"
         })
         temp = temp.filter((value) => {
             // value.salles.filter((value)=>{
@@ -29,6 +34,38 @@ export async function getAllSalles() {
     }
 }
 
+
+export async function getAllSallesProductByCategory(categoryId:string) {
+    try {
+        let temp = await product.find({
+            category:categoryId,
+        }).populate({
+            path: "salles.farmer_id",
+            select: "name"
+        }).populate({
+            path: "salles.seller_id",
+            select: "name"
+        })
+
+        temp = temp.filter((value,index,ary) => {
+            ary[index].salles=value.salles.filter((value)=>{
+                return (value.isVerified??false)&&(value.toShow??false)
+            })
+            return value.salles.length != 0 
+        })
+        if (temp.length == 0) {
+            throw new Error("No Products In Salles");
+        }
+       
+        return temp
+    } catch (error) {
+        console.log("error fro getSalles", error)
+        throw error
+    }
+}
+
+
+
 export async function addToSalles(productId: string, data: ISalles) {
     data.dateOfCreation = new Date()
     data.dateOfUpdate = new Date()
@@ -43,7 +80,7 @@ export async function addToSalles(productId: string, data: ISalles) {
             })
 
             if (sellerUser == null || !(sellerUser.isVerified ?? false)) {
-                console.log(sellerUser)
+   
                 throw new Error("Seller Not Found Or Not Verified")
             } else if (farmerUser == null || !(farmerUser.isVerified ?? false)) {
                 throw new Error("Farmer Not Found  Or Not Verified")
@@ -55,6 +92,7 @@ export async function addToSalles(productId: string, data: ISalles) {
                         salles: data
                     }
                 })
+                listernChngesAndSync()
                 return "Added the salles"
             }
         } else {
@@ -93,6 +131,7 @@ export async function toShowSalles(id:string,value: boolean) {
                     "salles.$.toShow":value
                 }
             })
+            listernChngesAndSync()
             return `Updated toShow to ${value}`
         }
     } catch (error) {
@@ -109,6 +148,7 @@ export async function toVerifieSalles(id:string,value: boolean) {
                     "salles.$.isVerified":value
                 }
             })
+            listernChngesAndSync()
             return `Verify toShow to ${value}`
         }
     } catch (error) {

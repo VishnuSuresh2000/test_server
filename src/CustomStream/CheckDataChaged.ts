@@ -1,8 +1,10 @@
 import { Stream } from "stream";
 
-var changeState = new Stream.Readable({
-
+export const changeStateSyncCategory = new Stream.Readable({
+    read:()=>{}
 })
-changeState._read = () => { }
 
-export default changeState
+export const changeStateSyncSalles= new Stream.Readable({
+    read:()=>{}
+})
+

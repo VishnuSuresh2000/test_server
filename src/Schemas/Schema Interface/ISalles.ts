@@ -8,5 +8,5 @@ export default interface ISalles extends Document{
     dateOfCreation?:Date,
     dateOfUpdate?:Date,
     isVerified?:boolean,
-    amount:number
+    
 }

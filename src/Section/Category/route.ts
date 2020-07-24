@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import changeState from '../../CustomStream/CheckDataChaged';
+import {changeStateSyncCategory} from '../../CustomStream/CheckDataChaged';
 import CRUD from '../../DataBase/crud';
 import category from '../../Schemas/category';
 import { outFunction } from '../functions';
@@ -10,7 +10,7 @@ var route_category = Router()
 async function syncWithUI(fun: Promise<string>) {
     try {
         let data = await fun
-        changeState.push("true")
+        changeStateSyncCategory.push("true")
         console.log(`set to true in stream ${data} from fun`)
         return data
     } catch (error) {
