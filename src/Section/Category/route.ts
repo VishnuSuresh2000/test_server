@@ -11,7 +11,6 @@ async function syncWithUI(fun: Promise<string>) {
     try {
         let data = await fun
         changeStateSyncCategory.push("true")
-        console.log(`set to true in stream ${data} from fun`)
         return data
     } catch (error) {
         throw error

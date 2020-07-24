@@ -7,5 +7,6 @@ export default interface IProduct extends Document{
     category:Types.ObjectId,
     inKg:boolean,
     amount:number,
+    hasImg:boolean
     salles:Array<ISalles>
 }

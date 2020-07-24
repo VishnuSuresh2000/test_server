@@ -41,10 +41,10 @@ export async function getAllSallesProductByCategory(categoryId:string) {
             category:categoryId,
         }).populate({
             path: "salles.farmer_id",
-            select: "name"
+            select: "firstName lastName"
         }).populate({
             path: "salles.seller_id",
-            select: "name"
+            select: "firstName lastName"
         })
 
         temp = temp.filter((value,index,ary) => {

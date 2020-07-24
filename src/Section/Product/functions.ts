@@ -129,3 +129,18 @@ export async function deleteProduct(id: string) {
         throw `${error} Error on fun:deleteProduct `
     }
 }
+
+export async function addImag(id:string){
+    try {
+        if (await isProductExist(true, id)) {
+            await product.findByIdAndUpdate(id,{
+                hasImg:true
+            })
+            return "ImageAdded"
+        }
+        throw new Error("Record Not exist with id")
+    } catch (error) {
+        console.log(error)
+        throw `${error} Error on fun:deleteProduct `
+    }
+}

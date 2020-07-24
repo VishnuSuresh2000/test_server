@@ -28,6 +28,10 @@ var product = new Schema<IProduct>({
     amount: {
         type: Number,
         required: true
+    },
+    hasImg:{
+        type:Boolean,
+        default:false
     }
 })
 
