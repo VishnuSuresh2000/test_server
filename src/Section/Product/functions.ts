@@ -1,3 +1,4 @@
+import { changeStateSyncSalles } from "../../CustomStream/CheckDataChaged";
 import category from "../../Schemas/category";
 import product from "../../Schemas/product";
 import { ICategory } from "../../Schemas/Schema Interface/ICategory";
@@ -136,6 +137,7 @@ export async function addImag(id:string){
             await product.findByIdAndUpdate(id,{
                 hasImg:true
             })
+            changeStateSyncSalles.push("true")
             return "ImageAdded"
         }
         throw new Error("Record Not exist with id")

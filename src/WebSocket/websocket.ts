@@ -6,7 +6,6 @@ import { changeStateSyncCategory, changeStateSyncSalles } from "../CustomStream/
 
 export default function syncWebSocket(app: Application): void {
     app.ws("/sync", (ws) => {
-        console.log("Conected to Socket sync")
         var listener=(data:any)=> {
    
             if (data == "true") {
