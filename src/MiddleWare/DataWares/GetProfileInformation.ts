@@ -12,7 +12,7 @@ export default function userInformation(model: Model<ICommonProfile>) {
             } else if (user == null) {
                 outFunction(res, () => { throw new Error("User Must Register") })
             } else {
-                res.locals.user = user
+                res.locals.userId = user._id
                 next()
             }
         } catch (error) {

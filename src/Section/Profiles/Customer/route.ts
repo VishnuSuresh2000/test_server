@@ -1,12 +1,9 @@
-import customer from "../../../Schemas/customer";
-import { Router, Request, Response } from "express";
-import CRUD from "../../../DataBase/crud";
-import { outFunction } from "../../functions";
-import { addIfProfileNotExist, updateIfProfileNotExist, isPhoneNumberAlreadyExist, isExistWithFirebaseId } from "../functions";
+import { Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
-
-var crud: CRUD = new CRUD(customer)
+import customer from "../../../Schemas/customer";
+import { outFunction } from "../../functions";
+import { addAddress, addIfProfileNotExistFirebase, checkHasAddress } from "../functions";
 
 var router = Router()
 
@@ -14,11 +11,21 @@ router.use(checkIfAuthenticated)
 router.use(userInformation(customer))
 router.post('/create', async (req: Request, res: Response) => {
     console.log(res.locals.firebase_id)
-    outFunction(res, async () => addIfProfileNotExist(req.body, res.locals.firebase_id, customer))
+    outFunction(res, async () => addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, customer))
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {
-    outFunction(res,() => true)
+    outFunction(res, () => true)
+})
+
+router.get("/hasAddress", async (_req: Request, res: Response) => {
+    console.log("user id from middleware ", res.locals.userId)
+    outFunction(res, async () => await checkHasAddress(res.locals.userId, customer))
+})
+
+router.put('/addAddress', async (req: Request, res: Response) => {
+    console.log("user id from middleware ", res.locals.userId)
+    outFunction(res, async () => await addAddress(res.locals.userId, req.body, customer))
 })
 
 

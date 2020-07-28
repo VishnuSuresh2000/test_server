@@ -12,7 +12,7 @@ const address=new Schema<IAddress>({
     },
     city:{
         type:String,
-        required:true
+        // required:true
     },
     district:{
         type:String,
