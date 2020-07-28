@@ -23,7 +23,7 @@ route_product.get('/getImage/:name',async(req: Request, res: Response)=>{
     var location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/product/${req.params.name}.png`)
     try {
         if(! fs.existsSync(location)){
-            location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/noImg.png`)
+            location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
         }
     } catch (error) {
         location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
