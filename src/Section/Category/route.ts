@@ -3,7 +3,24 @@ import {changeStateSyncCategory} from '../../CustomStream/CheckDataChaged';
 import CRUD from '../../DataBase/crud';
 import category from '../../Schemas/category';
 import { outFunction } from '../functions';
+import fs from 'fs'
 var crudCategory: CRUD = new CRUD(category)
+
+import multer from "multer"
+import { addImgCategory } from './functions';
+import path from 'path';
+
+
+var storage = multer.diskStorage({
+    destination: function (_req, _file, cb) {
+        cb(null, 'upload/category')
+    },
+    filename: function (_req, file, cb) {
+        cb(null, file.originalname) //Appending .jpg
+    }
+})
+
+var uploadMulter = multer({ storage: storage })
 
 var route_category = Router()
 
@@ -17,6 +34,21 @@ async function syncWithUI(fun: Promise<string>) {
     }
 }
 
+route_category.get('/getImage/:name',async(req: Request, res: Response)=>{
+    var location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/category/${req.params.name}.png`)
+    try {
+        if(! fs.existsSync(location)){
+            location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
+        }
+    } catch (error) {
+        location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
+    }finally{
+        res.sendFile(location)
+    }
+})
+route_category.post('/uploadImg/:id', uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
+    outFunction(res, async () => addImgCategory(req.params.id,true))
+})
 
 route_category.get('/', async (_req: Request, res: Response) =>
     outFunction(res, async () => crudCategory.read()))

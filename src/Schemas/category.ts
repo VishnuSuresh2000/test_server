@@ -6,6 +6,10 @@ const category = new Schema({
         type: String,
         required: true,
         lowercase: true
+    },
+    hasImg:{
+        type:Boolean,
+        default:false
     }
 })
 
