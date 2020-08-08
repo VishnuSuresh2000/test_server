@@ -11,21 +11,21 @@ router.use(checkIfAuthenticated)
 router.use(userInformation(customer))
 router.post('/create', async (req: Request, res: Response) => {
     console.log(res.locals.firebase_id)
-    outFunction(res, async () => addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, customer))
+    outFunction(res, addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, customer))
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {
-    outFunction(res, () => true)
+    outFunction(res,Promise.resolve(true))
 })
 
 router.get("/hasAddress", async (_req: Request, res: Response) => {
     console.log("user id from middleware ", res.locals.userId)
-    outFunction(res, async () => await checkHasAddress(res.locals.userId, customer))
+    outFunction(res, checkHasAddress(res.locals.userId, customer))
 })
 
 router.put('/addAddress', async (req: Request, res: Response) => {
     console.log("user id from middleware ", res.locals.userId)
-    outFunction(res, async () => await addAddress(res.locals.userId, req.body, customer))
+    outFunction(res,  addAddress(res.locals.userId, req.body, customer))
 })
 
 

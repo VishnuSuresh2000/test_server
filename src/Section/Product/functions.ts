@@ -131,11 +131,11 @@ export async function deleteProduct(id: string) {
     }
 }
 
-export async function addImag(id:string){
+export async function addImag(id:string,value:boolean){
     try {
         if (await isProductExist(true, id)) {
             await product.findByIdAndUpdate(id,{
-                hasImg:true
+                hasImg:value
             })
             changeStateSyncSalles.push("true")
             return "ImageAdded"

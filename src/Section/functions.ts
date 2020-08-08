@@ -1,9 +1,9 @@
 import { Response } from 'express'
 
-export async function outFunction(res: Response, callBackFunction: Function) {
-    
+export async function outFunction(res: Response, callBackFunction: Promise<any>) {
     try {
-        let temp=await callBackFunction()
+        let temp=await callBackFunction
+        res.locals="No Data Available";
         res.send({
             data: temp
         })
@@ -21,4 +21,21 @@ export async function outFunction(res: Response, callBackFunction: Function) {
         }
         
     }
+}
+
+
+export async function checkIsAdmin(res: Response, callBack: Promise<any>) {
+
+    try {
+        if (res.locals.isAdmin) {
+
+            return await callBack
+        } else {
+            throw new Error("Not Admin");
+        }
+    } catch (error) {
+        console.log("Error from admincheck", error)
+        throw error
+    }
+
 }

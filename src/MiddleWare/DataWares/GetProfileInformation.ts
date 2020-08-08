@@ -10,14 +10,14 @@ export default function userInformation(model: Model<ICommonProfile>) {
             if (req.url == "/create") {
                next()  
             } else if (user == null) {
-                outFunction(res, () => { throw new Error("User Must Register") })
+                outFunction(res, Promise.reject(new Error("User Must Register")))
             } else {
                 res.locals.userId = user._id
                 next()
             }
         } catch (error) {
             console.log(error)
-            outFunction(res, () => { throw new Error("Server Error") })
+            outFunction(res, Promise.reject(new Error("Server Error")))
         }
 }
 }

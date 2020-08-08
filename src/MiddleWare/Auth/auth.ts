@@ -21,15 +21,20 @@ export default async function checkIfAuthenticated(req: Request, res: Response, 
         let token = getAuthToken(req.headers.authorization as string)
         if (token != null) {
             const userInfo = await admin.auth().verifyIdToken(token)
-            // console.log(userInfo.uid)
+
             res.locals.firebase_id = userInfo.uid
+            if (userInfo.email == "admin@beru-dev.com") {
+                res.locals.isAdmin = true;
+            } else {
+                res.locals.isAdmin = false;
+            }
             return next()
         } else {
-            outFunction(res, () => { throw new Error("No User Found Login") })
+            outFunction(res, Promise.reject(new Error("No User Found Login")))
         }
     } catch (error) {
         console.log(error)
-        outFunction(res, () => { throw new Error("You are not authorized to make this request") })
+        outFunction(res, Promise.reject(new Error("You are not authorized to make this request")))
     }
 }
 

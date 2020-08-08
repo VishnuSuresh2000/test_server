@@ -1,10 +1,11 @@
-import { Router, Response, Request } from 'express'
-import { getAllProduct, addProduct, deleteProduct, readSingleProduct, updateProduct, addImag } from './functions'
-import { outFunction } from '../functions';
-import fs from 'fs'
-import path from 'path'
+import { Request, Response, Router } from 'express';
+import fs from 'fs';
+import multer from "multer";
+import path from 'path';
+import checkIfAuthenticated from '../../MiddleWare/Auth/auth';
+import { checkIsAdmin, outFunction } from '../functions';
+import { addImag, addProduct, getAllProduct, readSingleProduct, updateProduct } from './functions';
 
-import multer from "multer"
 
 
 var storage = multer.diskStorage({
@@ -19,43 +20,45 @@ var uploadMulter = multer({ storage: storage })
 
 var route_product = Router()
 
-route_product.get('/getImage/:name',async(req: Request, res: Response)=>{
-    var location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/product/${req.params.name}.png`)
+route_product.get('/getImage/:name', async (req: Request, res: Response) => {
+    var location = path.join(path.dirname(path.dirname(path.dirname(__dirname))), `upload/product/${req.params.name}.png`)
     try {
-        if(! fs.existsSync(location)){
-            location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
+        if (!fs.existsSync(location)) {
+            location = path.join(path.dirname(path.dirname(path.dirname(__dirname))), `upload/NoImg.png`)
+            addImag(req.params.name, false)
         }
     } catch (error) {
-        location=path.join(path.dirname(path.dirname(path.dirname(__dirname))),`upload/NoImg.png`)
-    }finally{
+        console.log("error from getimag in product", error)
+        location = path.join(path.dirname(path.dirname(path.dirname(__dirname))), `upload/NoImg.png`)
+    } finally {
         res.sendFile(location)
     }
 })
 
 
 route_product.get('/', async (_req: Request, res: Response) => {
-    outFunction(res, async () => await getAllProduct())
+    outFunction(res, getAllProduct())
 });
 
-route_product.post('/uploadImg/:id', uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
-    outFunction(res, async () => addImag(req.params.id))
+route_product.post('/uploadImg/:id', checkIfAuthenticated, uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
+    outFunction(res, checkIsAdmin(res, addImag(req.params.id, true)))
 })
 
-route_product.post('/', async (req: Request, res: Response) => {
-    outFunction(res, async () => addProduct(req.body))
+route_product.post('/create', checkIfAuthenticated, async (req: Request, res: Response) => {
+    outFunction(res, checkIsAdmin(res, addProduct(req.body)))
 })
 
 
-route_product.put("/:id", async (req: Request, res: Response) => {
-    outFunction(res, async () => await updateProduct(req.params.id, req.body))
+route_product.put("/update/:id", checkIfAuthenticated, async (req: Request, res: Response) => {
+    outFunction(res, checkIsAdmin(res, updateProduct(req.params.id, req.body)))
 })
 
-route_product.delete("/:id", async (req: Request, res: Response) => {
-    outFunction(res, async () => await deleteProduct(req.params.id))
-})
+// route_product.delete("/:id", async (req: Request, res: Response) => {
+//     outFunction(res, deleteProduct(req.params.id))
+// })
 
 route_product.get("/:id", async (req: Request, res: Response) => {
-    outFunction(res, async () => await readSingleProduct(req.params.id))
+    outFunction(res, readSingleProduct(req.params.id))
 })
 
 export default route_product
