@@ -1,38 +1,32 @@
+import { Request, Response, Router } from "express";
+import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
+import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
 import seller from "../../../Schemas/seller";
-import { Router, Request,Response } from "express";
-import CRUD from "../../../DataBase/crud";
 import { outFunction } from "../../functions";
-import { addIfProfileNotExist, updateIfProfileNotExist, isPhoneNumberAlreadyExist, varifyAccount } from "../functions";
-var crudseller: CRUD = new CRUD(seller)
-
-var router_seller=Router()
+import { addAddress, addIfProfileNotExistFirebase, checkHasAddress } from "../functions";
 
 
-// router_seller.get('/',async(_req:Request,res:Response)=>{
-//     outFunction(res, async () => crudseller.read())
-// })
+var router = Router()
 
-// router_seller.post('/',async(req:Request,res:Response)=>{
-//     outFunction(res, async () =>addIfProfileNotExist(req.body, res.locals.firebase_id,seller) )
+router.use(checkIfAuthenticated)
+router.use(userInformation(seller))
+router.post('/create', async (req: Request, res: Response) => {
+    console.log(res.locals.firebase_id)
+    outFunction(res, addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, seller))
+})
 
-// })
-// router_seller.get('/:id',async(req:Request,res:Response)=>{
-//     outFunction(res, async () => crudseller.readSingleRecord(req.params.id))
-// })
+router.get('/checkForExist', async (_req: Request, res: Response) => {
+    outFunction(res, Promise.resolve(true))
+})
 
-// router_seller.put('/:id',async(req:Request,res:Response)=>{
-//     outFunction(res, async () => updateIfProfileNotExist(req.params.id,req.body,seller))
-// })
-// router_seller.delete('/:id',async(req:Request,res:Response)=>{
-//     outFunction(res, async () => crudseller.deleteRecord(req.params.id))
-// })
+router.get("/hasAddress", async (_req: Request, res: Response) => {
+    console.log("user id from middleware ", res.locals.userId)
+    outFunction(res, checkHasAddress(res.locals.userId, seller))
+})
 
-// router_seller.get('/phNoExist/:id',async(req:Request,res:Response)=>{
-//     outFunction(res, async () => isPhoneNumberAlreadyExist(+req.params.id,seller))
-// })
+router.put('/addAddress', async (req: Request, res: Response) => {
+    console.log("user id from middleware ", res.locals.userId)
+    outFunction(res, addAddress(res.locals.userId, req.body, seller))
+})
 
-// router_seller.put("/verify/:show",async(req:Request,res:Response)=>{
-//     outFunction(res, async () => varifyAccount(req.body.id,JSON.parse(req.params.show),seller))
-// })
-
-export default router_seller
+export default router
