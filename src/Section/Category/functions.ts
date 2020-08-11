@@ -1,3 +1,4 @@
+import { NoRecordFound } from "../../CustomExceptions/Custom_Exception";
 import { changeStateSyncCategory } from "../../CustomStream/CheckDataChaged";
 import category from "../../Schemas/category";
 
@@ -10,9 +11,10 @@ export async function addImgCategory(id: string, value: boolean) {
             changeStateSyncCategory.push("true")
             return `Image has ${value?'Added':'Not Added'}`
         }else{
-            throw new Error("No record Found")
+            throw new NoRecordFound()
         }
     } catch (error) {
-
+        console.log("Error from addImgCategory",error);
+        throw error;
     }
 }

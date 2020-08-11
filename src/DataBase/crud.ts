@@ -1,4 +1,5 @@
 import { Model, Document } from 'mongoose'
+import { AlredyExist, NoRecordFound } from '../CustomExceptions/Custom_Exception'
 
 class CRUD {
     _model: Model<Document>
@@ -14,22 +15,22 @@ class CRUD {
                 await temp.save()
                 return "Record added"
             } else {
-                throw new Error("all ready exist")
+                throw new AlredyExist()
             }
         } catch (error) {
-            console.log("error", error)
-            throw new Error(`Record not added {error on add}`)
+            console.log("error from addData Crud", error)
+            throw error
         }
     }
     async read() {
         try {
             var data = await this._model.find()
             if (data.length == 0) {
-                throw new Error("No Records Found")
+                throw new NoRecordFound()
             }
             return data
         } catch (error) {
-            console.log("error on fun:read", error)
+            console.log("error from read Crud", error)
             throw error
         }
     }
@@ -42,9 +43,8 @@ class CRUD {
             }
             return true
         } catch (error) {
-            console.log(error)
-            throw new Error(`error occured {error on isExist}`);
-
+            console.log("error from isExist Crud", error)
+            throw error
         }
     }
 
@@ -55,10 +55,10 @@ class CRUD {
                 await this._model.findByIdAndUpdate(id, data)
                 return "Record Update"
             } else {
-                throw new Error("Record Not exist")
+                throw new NoRecordFound()
             }
         } catch (error) {
-            console.log("error on updateRecord", error)
+            console.log("error on updateRecord crud", error)
             throw error
         }
     }
@@ -70,15 +70,12 @@ class CRUD {
                 await this._model.findByIdAndRemove(id)
                 return "Record Delete"
             } else {
-                throw new Error("Record Not exist")
+                throw new NoRecordFound()
             }
 
         } catch (error) {
-            console.log("error on deleteRecord", error)
+            console.log("error from deleteRecord Crud", error)
             throw error
-
-
-
         }
     }
     async readSingleRecord(id: string) {
@@ -88,10 +85,10 @@ class CRUD {
                 let temp = await this._model.findOne({ _id: id })
                 return temp?.toJSON()
             } else {
-                throw new Error("Record Not exist")
+                throw new NoRecordFound()
             }
         } catch (error) {
-            console.log("error on deleteRecord", error)
+            console.log("error on deleteRecord Crud", error)
             throw error
         }
     }

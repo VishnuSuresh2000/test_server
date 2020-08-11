@@ -1,4 +1,5 @@
 import { Model } from "mongoose";
+import { AlreadyExistPhoneNumber, AlredyExist, NoUserFound } from "../../CustomExceptions/Custom_Exception";
 import IAddress from "../../Schemas/Schema Interface/IAddress";
 import ICommonProfile from "../../Schemas/Schema Interface/ICommonProfile";
 
@@ -14,12 +15,12 @@ export async function addIfProfileNotExist(data: ICommonProfile, firebase_id: st
             return "Added Profile"
         } else if (res2 != null) {
             console.log(res2)
-            throw new Error(`Already Exist With Same Number Plz Change Number`)
+            throw new AlreadyExistPhoneNumber()
         }
-        throw new Error(`Already Exist`)
+        throw new AlredyExist()
     } catch (error) {
         console.log("error on isProfileExist", error)
-        throw `${error}`
+        throw error
     }
 }
 
@@ -32,10 +33,10 @@ export async function updateIfProfileNotExist(id: string, data: ICommonProfile, 
             await model.findByIdAndUpdate(id, data)
             return "Updated Profile"
         }
-        throw new Error(`Exist The pHone Number with another user`)
+        throw new AlreadyExistPhoneNumber()
     } catch (error) {
         console.log("error on isProfileExist", error)
-        throw `${error}`
+        throw error
 
     }
 }
@@ -61,7 +62,7 @@ export async function varifyAccount(id: string, show: boolean, model: Model<ICom
             await model.findByIdAndUpdate(id, { isVerified: show })
             return "Varification Updated"
         }
-        throw new Error("Not Exist Profile")
+        throw new NoUserFound()
     } catch (error) {
         console.log(error)
         throw error
@@ -108,12 +109,12 @@ export async function addIfProfileNotExistFirebase(data: ICommonProfile, firebas
             return "Added Profile"
         } else if (res2 != null) {
             console.log(res2)
-            throw new Error(`Already Exist With Same Number Plz Change Number`)
+            throw new AlreadyExistPhoneNumber()
         }
-        throw new Error(`Already Exist`)
+        throw new AlredyExist()
     } catch (error) {
         console.log("error on isProfileExist", error)
-        throw `${error}`
+        throw error
     }
 }
 
@@ -124,11 +125,11 @@ export async function checkHasAddress(id: string, model: Model<ICommonProfile>) 
             console.log("From Check Address Exist", temp.address == null)
             return temp.address != null
         } else {
-            throw new Error("No User Detected")
+            throw new NoUserFound()
         }
     } catch (error) {
         console.log("error on checkHasAddress", error)
-        throw `${error}`
+        throw error
     }
 }
 
@@ -140,12 +141,24 @@ export async function addAddress(id: string, data: IAddress, model: Model<ICommo
             })
             return "Address Added"
         } else {
-            throw new Error("Alredy Has Address");
-
+            throw new NoUserFound()
         }
-
     } catch (error) {
         console.log("error on addAddress", error)
-        throw `${error}`
+        throw error
+    }
+}
+
+export async function checkIsverified(id: string, model: Model<ICommonProfile>) {
+    try {
+        if (await isExistWithId(id, model)) {
+            let value = await model.findOne({ _id: id }) as ICommonProfile
+            return value?.isVerified ?? false
+        } else {
+            throw new NoUserFound()
+        }
+    } catch (error) {
+        console.log("error on checkIsverified", error)
+        throw error
     }
 }

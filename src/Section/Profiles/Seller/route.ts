@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
+import ICommonProfile from "../../../Schemas/Schema Interface/ICommonProfile";
 import seller from "../../../Schemas/seller";
 import { outFunction } from "../../functions";
 import { addAddress, addIfProfileNotExistFirebase, checkHasAddress } from "../functions";
@@ -11,8 +12,9 @@ var router = Router()
 router.use(checkIfAuthenticated)
 router.use(userInformation(seller))
 router.post('/create', async (req: Request, res: Response) => {
-    console.log(res.locals.firebase_id)
-    outFunction(res, addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, seller))
+    var data: ICommonProfile = req.body;
+    data.isVerified = false;
+    outFunction(res, addIfProfileNotExistFirebase(data, res.locals.firebase_id, seller))
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {

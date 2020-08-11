@@ -2,8 +2,6 @@
 import { Application } from "express-ws";
 import { changeStateSyncCategory, changeStateSyncSalles } from "../CustomStream/CheckDataChaged";
 
-
-
 export default function syncWebSocket(app: Application): void {
     app.ws("/sync", (ws) => {
         var listener=(data:any)=> {

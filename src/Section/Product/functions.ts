@@ -1,3 +1,4 @@
+import { ExistWithName, NoRecordFound } from "../../CustomExceptions/Custom_Exception";
 import { changeStateSyncSalles } from "../../CustomStream/CheckDataChaged";
 import category from "../../Schemas/category";
 import product from "../../Schemas/product";
@@ -6,16 +7,16 @@ import IProduct from "../../Schemas/Schema Interface/IProduct";
 
 export async function getAllProduct() {
     try {
-        
+
         var response = await product.find().populate('category')
         if (response.length != 0) {
-            
+
             return response
         }
-        throw new Error("No records Found")
+        throw new NoRecordFound()
     } catch (error) {
-        console.log(error)
-        throw `${error} Error on fun:getAllproduct`
+        console.log("Error from getAllProduct", error)
+        throw error
     }
 }
 interface InputProduct {
@@ -26,7 +27,7 @@ interface InputProduct {
         name: string,
         _id: string
     },
-    inKg:boolean
+    inKg: boolean
 }
 
 
@@ -40,7 +41,8 @@ export async function isProductExist(idOrName: boolean, data: string) {
         }
         return false
     } catch (error) {
-        throw `${error} isProductExist`
+        console.log("Error from isProductExist", error)
+        throw error
     }
 
 }
@@ -55,11 +57,11 @@ export async function addProduct(data: InputProduct) {
             await temp.save()
             return "Record added"
         }
-        throw new Error("Record already exist with same name")
+        throw new ExistWithName()
 
     } catch (error) {
-        console.log(error)
-        throw `${error} Error on addProduct`
+        console.log("Error from addProduct", error)
+        throw error
     }
 
 }
@@ -77,17 +79,17 @@ export async function updateProduct(id: string, data: IProduct) {
                     description: data.description,
                     category: res._id,
                     _id: id,
-                    inKg:data.inKg,
-                    amount:data.amount
+                    inKg: data.inKg,
+                    amount: data.amount
                 }
             );
             return "Record Updated"
         }
-        throw new Error("Record Not exist with same _id")
+        throw new NoRecordFound()
 
     } catch (error) {
-        console.log("error in update Product", error)
-        throw `${error} Error on fun:updateProduct`
+        console.log("Error from updateProduct", error)
+        throw error
     }
 }
 
@@ -101,15 +103,15 @@ export async function readSingleProduct(id: string) {
                 name: response?.name,
                 category: temp?._id,
                 description: response?.description,
-                inKg:response.inKg,
-                amount:response.amount
+                inKg: response.inKg,
+                amount: response.amount
             }
             return out
         }
-        throw new Error("No record Found")
+        throw new NoRecordFound()
     } catch (error) {
-        console.log(error)
-        throw `${error} Error on fun:readSingleProduct`
+        console.log("Error from readSingleProduct", error)
+        throw error
     }
 
 }
@@ -122,27 +124,27 @@ export async function deleteProduct(id: string) {
             await product.findByIdAndRemove(id)
             return "Rrecord Deleted"
         }
-        throw new Error("Record Not exist with same _id")
+        throw new NoRecordFound()
 
 
     } catch (error) {
-        console.log(error)
-        throw `${error} Error on fun:deleteProduct `
+        console.log("Error from deleteProduct", error)
+        throw error
     }
 }
 
-export async function addImag(id:string,value:boolean){
+export async function addImag(id: string, value: boolean) {
     try {
         if (await isProductExist(true, id)) {
-            await product.findByIdAndUpdate(id,{
-                hasImg:value
+            await product.findByIdAndUpdate(id, {
+                hasImg: value
             })
             changeStateSyncSalles.push("true")
             return "ImageAdded"
         }
-        throw new Error("Record Not exist with id")
+        throw new NoRecordFound()
     } catch (error) {
-        console.log(error)
-        throw `${error} Error on fun:deleteProduct `
+        console.log("Error from addImag", error)
+        throw error
     }
 }

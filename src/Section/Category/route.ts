@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express';
 import { changeStateSyncCategory } from '../../CustomStream/CheckDataChaged';
 import CRUD from '../../DataBase/crud';
 import category from '../../Schemas/category';
-import { checkIsAdmin, outFunction } from '../functions';
+import {outFunction } from '../functions';
 import fs from 'fs'
 var crudCategory: CRUD = new CRUD(category)
 
@@ -10,6 +10,7 @@ import multer from "multer"
 import { addImgCategory } from './functions';
 import path from 'path';
 import checkIfAuthenticated from '../../MiddleWare/Auth/auth';
+import checkIsAdmin from '../../MiddleWare/Auth/CheckIsAdmin';
 
 
 var storage = multer.diskStorage({
@@ -50,22 +51,22 @@ route_category.get('/getImage/:name', async (req: Request, res: Response) => {
         res.sendFile(location)
     }
 })
-route_category.post('/uploadImg/:id', checkIfAuthenticated, uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
-    outFunction(res, checkIsAdmin(res, addImgCategory(req.params.id, true)))
+route_category.post('/uploadImg/:id', checkIfAuthenticated,checkIsAdmin, uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
+    outFunction(res,  addImgCategory(req.params.id, true))
 })
 
 
 
 route_category.get('/', async (_req: Request, res: Response) =>
     outFunction(res, crudCategory.read()))
-route_category.post('/create', checkIfAuthenticated, async (req: Request, res: Response) =>
-    outFunction(res, checkIsAdmin(res, syncWithUI(crudCategory.addData(req.body))))
+route_category.post('/create', checkIfAuthenticated,checkIsAdmin, async (req: Request, res: Response) =>
+    outFunction(res, syncWithUI(crudCategory.addData(req.body)))
 )
 route_category.get('/:id', async (req: Request, res: Response) =>
     outFunction(res, crudCategory.readSingleRecord(req.params.id)))
 
-route_category.put('/update/:id', checkIfAuthenticated, async (req: Request, res: Response) =>
-    outFunction(res, checkIsAdmin(res, syncWithUI(crudCategory.updateRecord(req.params.id, req.body))))
+route_category.put('/update/:id', checkIfAuthenticated,checkIsAdmin, async (req: Request, res: Response) =>
+    outFunction(res, syncWithUI(crudCategory.updateRecord(req.params.id, req.body)))
 )
 // route_category.delete('/:id', async (req: Request, res: Response) =>
 //     outFunction(res, syncWithUI(crudCategory.deleteRecord(req.params.id)))

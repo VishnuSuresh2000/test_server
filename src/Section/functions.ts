@@ -8,6 +8,7 @@ export async function outFunction(res: Response, callBackFunction: Promise<any>)
             data: temp
         })
     } catch (error) {
+        console.log("Some test in error",error instanceof Error)
         res.locals="No Data Available";
         console.log("get all", error)
         if(error instanceof Error){
@@ -24,18 +25,18 @@ export async function outFunction(res: Response, callBackFunction: Promise<any>)
 }
 
 
-export async function checkIsAdmin(res: Response, callBack: Promise<any>) {
+// export async function checkIsAdmin(res: Response, callBack: Promise<any>) {
 
-    try {
-        if (res.locals.isAdmin) {
+//     try {
+//         if (res.locals.isAdmin) {
 
-            return await callBack
-        } else {
-            throw new Error("Not Admin");
-        }
-    } catch (error) {
-        console.log("Error from admincheck", error)
-        throw error
-    }
+//             return await callBack
+//         } else {
+//             throw new Error("Not Admin");
+//         }
+//     } catch (error) {
+//         console.log("Error from admincheck", error)
+//         throw error
+//     }
 
-}
+// }

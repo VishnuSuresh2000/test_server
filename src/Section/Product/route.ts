@@ -3,7 +3,8 @@ import fs from 'fs';
 import multer from "multer";
 import path from 'path';
 import checkIfAuthenticated from '../../MiddleWare/Auth/auth';
-import { checkIsAdmin, outFunction } from '../functions';
+import checkIsAdmin from '../../MiddleWare/Auth/CheckIsAdmin';
+import {outFunction } from '../functions';
 import { addImag, addProduct, getAllProduct, readSingleProduct, updateProduct } from './functions';
 
 
@@ -40,17 +41,17 @@ route_product.get('/', async (_req: Request, res: Response) => {
     outFunction(res, getAllProduct())
 });
 
-route_product.post('/uploadImg/:id', checkIfAuthenticated, uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
-    outFunction(res, checkIsAdmin(res, addImag(req.params.id, true)))
+route_product.post('/uploadImg/:id', checkIfAuthenticated,checkIsAdmin, uploadMulter.single('imgUrl'), async (req: Request, res: Response) => {
+    outFunction(res, addImag(req.params.id, true))
 })
 
-route_product.post('/create', checkIfAuthenticated, async (req: Request, res: Response) => {
-    outFunction(res, checkIsAdmin(res, addProduct(req.body)))
+route_product.post('/create', checkIfAuthenticated,checkIsAdmin, async (req: Request, res: Response) => {
+    outFunction(res, addProduct(req.body))
 })
 
 
-route_product.put("/update/:id", checkIfAuthenticated, async (req: Request, res: Response) => {
-    outFunction(res, checkIsAdmin(res, updateProduct(req.params.id, req.body)))
+route_product.put("/update/:id", checkIfAuthenticated,checkIsAdmin, async (req: Request, res: Response) => {
+    outFunction(res, updateProduct(req.params.id, req.body))
 })
 
 // route_product.delete("/:id", async (req: Request, res: Response) => {
