@@ -57,7 +57,7 @@ route_category.post('/uploadImg/:id', checkIfAuthenticated,checkIsAdmin, uploadM
 
 
 
-route_category.get('/', async (_req: Request, res: Response) =>
+route_category.get('/data', async (_req: Request, res: Response) =>
     outFunction(res, crudCategory.read()))
 route_category.post('/create', checkIfAuthenticated,checkIsAdmin, async (req: Request, res: Response) =>
     outFunction(res, syncWithUI(crudCategory.addData(req.body)))

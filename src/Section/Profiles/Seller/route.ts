@@ -1,15 +1,25 @@
 import { Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
+import checkIsAdmin from "../../../MiddleWare/Auth/CheckIsAdmin";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
 import ICommonProfile from "../../../Schemas/Schema Interface/ICommonProfile";
 import seller from "../../../Schemas/seller";
 import { outFunction } from "../../functions";
-import { addAddress, addIfProfileNotExistFirebase, checkHasAddress } from "../functions";
-
+import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverified, getAllData, Verifie } from "../functions";
 
 var router = Router()
 
 router.use(checkIfAuthenticated)
+//admin Section
+router.get('/data', checkIsAdmin, async (_req: Request, res: Response) => {
+    outFunction(res, getAllData(seller))
+})
+router.put('/verifie/:id', checkIsAdmin, async (req: Request, res: Response) => {
+    outFunction(res, Verifie(req.params.id, req.body.value, seller))
+})
+
+// seller section
+
 router.use(userInformation(seller))
 router.post('/create', async (req: Request, res: Response) => {
     var data: ICommonProfile = req.body;
@@ -29,6 +39,10 @@ router.get("/hasAddress", async (_req: Request, res: Response) => {
 router.put('/addAddress', async (req: Request, res: Response) => {
     console.log("user id from middleware ", res.locals.userId)
     outFunction(res, addAddress(res.locals.userId, req.body, seller))
+})
+
+router.get('/checkIsVerified', async (_req: Request, res: Response) => {
+    outFunction(res, checkIsverified(res.locals.userId, seller))
 })
 
 export default router

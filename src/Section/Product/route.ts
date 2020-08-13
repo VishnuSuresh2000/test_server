@@ -37,7 +37,7 @@ route_product.get('/getImage/:name', async (req: Request, res: Response) => {
 })
 
 
-route_product.get('/', async (_req: Request, res: Response) => {
+route_product.get('/data', async (_req: Request, res: Response) => {
     outFunction(res, getAllProduct())
 });
 

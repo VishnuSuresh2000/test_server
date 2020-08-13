@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { AlreadyExistPhoneNumber, AlredyExist, NoUserFound } from "../../CustomExceptions/Custom_Exception";
+import { AlreadyExistPhoneNumber, AlredyExist, NoRecordFound, NoUserFound } from "../../CustomExceptions/Custom_Exception";
 import IAddress from "../../Schemas/Schema Interface/IAddress";
 import ICommonProfile from "../../Schemas/Schema Interface/ICommonProfile";
 
@@ -159,6 +159,33 @@ export async function checkIsverified(id: string, model: Model<ICommonProfile>) 
         }
     } catch (error) {
         console.log("error on checkIsverified", error)
+        throw error
+    }
+}
+
+export async function Verifie(id: string, value: boolean, model: Model<ICommonProfile>) {
+    try {
+        if (await isExistWithId(id, model)) {
+            await model.findOneAndUpdate({ _id: id }, { isVerified: value })
+            return `${value ? 'Verified' : 'UnVerified'}`
+        } else {
+            throw new NoUserFound()
+        }
+    } catch (error) {
+        console.log("error on Verifie", error)
+        throw error
+    }
+}
+
+export async function getAllData(model: Model<ICommonProfile>) {
+    try {
+        let value = await model.find()
+        if (value.length == 0) {
+            throw new NoRecordFound()
+        }
+        return value;
+    } catch (error) {
+        console.log("error on  getAllData", error)
         throw error
     }
 }
