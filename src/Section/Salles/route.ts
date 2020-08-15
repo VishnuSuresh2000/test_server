@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import ISalles from "../../Schemas/Schema Interface/ISalles";
 import { outFunction } from "../functions";
-import { addToSalles, getAllSallesForSeller } from "./functions";
+import { addToSalles, getAllSallesForSeller, toShowSalles, updateCount } from "./functions";
 
 export var router = Router()
 
@@ -22,7 +22,13 @@ export function sallesSectionForSeller(router: Router) {
         data.seller_id = res.locals.userId
         outFunction(res, addToSalles(req.params.id, data))
     })
-
+    router.put('/salles/toShow/:id', async (req: Request, res: Response) => {
+     
+        outFunction(res, toShowSalles(req.params.id, req.body.value))
+    })
+    router.put('/salles/updateCount/:id', async (req: Request, res: Response) => {
+        outFunction(res, updateCount(req.params.id, req.body.value))
+    })
 }
 
 

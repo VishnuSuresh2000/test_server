@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import checkIsAdmin from "../../../MiddleWare/Auth/CheckIsAdmin";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
@@ -11,6 +11,7 @@ import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverif
 var router = Router()
 
 router.use(checkIfAuthenticated)
+
 //admin Section
 router.get('/data', checkIsAdmin, async (_req: Request, res: Response) => {
     outFunction(res, getAllData(seller))

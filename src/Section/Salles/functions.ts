@@ -42,8 +42,8 @@ export async function getAllSallesForSeller(id: string) {
             path: "salles.farmer_id",
             select: "firstName lastName"
         }).populate({
-            path:"category",
-            select:"name"
+            path: "category",
+            select: "name"
         })
         temp = temp.filter((value) => {
             // value.salles.filter((value)=>{
@@ -54,7 +54,7 @@ export async function getAllSallesForSeller(id: string) {
         if (temp.length == 0) {
             throw new NoProductForSalles()
         }
-    
+
         return temp
     } catch (error) {
         console.log("error fro getSalles", error)
@@ -84,7 +84,7 @@ export async function getAllSallesProductByCategory(categoryId: string) {
         if (temp.length == 0) {
             throw new NoProductForSalles()
         }
-      
+
         return temp
     } catch (error) {
         console.log("error fro getSalles", error)
@@ -103,7 +103,7 @@ export async function addToSalles(productId: string, data: ISalles) {
             let farmerUser = await farmer.findOne({ _id: data.farmer_id })
             let isExistProduct = await product.findOne({ _id: productId }) as IProduct
             var temp = isExistProduct.salles.filter((value) => {
-               return (value.farmer_id.equals(data.farmer_id)) && (value.seller_id.equals(data.seller_id))
+                return (value.farmer_id.equals(data.farmer_id)) && (value.seller_id.equals(data.seller_id))
             })
             if (sellerUser == null || !(sellerUser.isVerified ?? false)) {
                 throw new ProfileNotFoundOrUnverified("Seller")
@@ -158,6 +158,25 @@ export async function toShowSalles(id: string, value: boolean) {
             })
             listernChngesAndSync()
             return `Updated toShow to ${value}`
+        }
+    } catch (error) {
+        console.log("error fro isSallesExist", error)
+        throw error
+    }
+}
+export async function updateCount(id: string, value: number) {
+    try {
+        if (await isSallesExist(id)) {
+            let data = await product.findOne({ "salles._id": id }) as IProduct
+            data.salles = data.salles.filter((value) => value._id == id)
+          
+            await product.findOneAndUpdate({ "salles._id": id }, {
+                '$set': {
+                    "salles.$.count": value + (data.salles[0].count as number)
+                }
+            })
+            listernChngesAndSync()
+            return `${value} add to salles`
         }
     } catch (error) {
         console.log("error fro isSallesExist", error)
