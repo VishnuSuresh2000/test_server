@@ -19,6 +19,26 @@ export async function getAllProduct() {
         throw error
     }
 }
+
+export async function getProductByCategory(id: string) {
+    try {
+        var response = await product.find({ category: id })
+            .populate({
+                path:'category',
+                select:["name","_id"]
+            })
+            .select(['category', '_id', 'name', 'amount'])
+        if (response.length != 0) {
+            return response
+        }
+        throw new NoRecordFound()
+    } catch (error) {
+        console.log("Error from getAllProduct", error)
+        throw error
+    }
+}
+
+
 interface InputProduct {
     _id: string
     name: string,

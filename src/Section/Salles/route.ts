@@ -1,30 +1,29 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
+import ISalles from "../../Schemas/Schema Interface/ISalles";
 import { outFunction } from "../functions";
-import { addToSalles, getAllSalles, getAllSallesProductByCategory, toShowSalles, toVerifieSalles } from "./functions";
+import { addToSalles, getAllSallesForSeller } from "./functions";
 
-var route_salles = Router()
+export var router = Router()
 
-// route_salles.get('/', async (_req: Request, res: Response) => {
-//     outFunction(res, async () => await getAllSalles())
-// })
+router.get('/dataOfSalles/:id', async (req: Request, res: Response) => {
+    outFunction(res, getAllSallesForSeller(req.params.id))
+})
 
-// route_salles.get('/getProductByCategory/:id', async (req: Request, res: Response) => {
-//     outFunction(res, async () => await getAllSallesProductByCategory(req.params.id))
-// })
+router.post('/addSalles/:id', async (req: Request, res: Response) => {
+    outFunction(res, addToSalles(req.params.id, req.body))
+})
 
-// route_salles.post('/:id', async (req: Request, res: Response) => {
-//     outFunction(res, async () => await addToSalles(req.params.id, req.body))
-// })
+export function sallesSectionForSeller(router: Router) {
+    router.get('/salles/forSeller', async (_req: Request, res: Response) => {
+        outFunction(res, getAllSallesForSeller(res.locals.userId))
+    })
+    router.post('/salles/addSalles/:id', async (req: Request, res: Response) => {
+        let data: ISalles = req.body
+        data.seller_id = res.locals.userId
+        outFunction(res, addToSalles(req.params.id, data))
+    })
 
-// route_salles.put('/toVerifiy', async (req: Request, res: Response) => {
+}
 
-//     outFunction(res, async () => await toVerifieSalles(req.body.id, req.body.value))
 
-// })
-// route_salles.put('/toShow', async (req: Request, res: Response) => {
 
-//     outFunction(res, async () => await toShowSalles(req.body.id, req.body.value))
-
-// })
-
-export default route_salles

@@ -122,7 +122,6 @@ export async function checkHasAddress(id: string, model: Model<ICommonProfile>) 
     try {
         if (await isExistWithId(id, model)) {
             let temp = await model.findOne({ _id: id }) as ICommonProfile
-            console.log("From Check Address Exist", temp.address == null)
             return temp.address != null
         } else {
             throw new NoUserFound()

@@ -8,9 +8,9 @@ var crudFarmer: CRUD = new CRUD(farmer)
 var router_farmer=Router()
 
 
-// router_farmer.get('/',async(_req:Request,res:Response)=>{
-//     outFunction(res, async () => crudFarmer.read())
-// })
+router_farmer.get('/data',async(_req:Request,res:Response)=>{
+    outFunction(res,crudFarmer.read())
+})
 
 // router_farmer.post('/',async(req:Request,res:Response)=>{
 //     outFunction(res, async () =>addIfProfileNotExist(req.body, res.locals.firebase_id,farmer) )
