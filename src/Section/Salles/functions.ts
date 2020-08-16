@@ -1,6 +1,5 @@
 import { AlredyHasSales, NoProductForSalles, NoProductFound, ProfileNotFoundOrUnverified } from "../../CustomExceptions/CustomExceptionForSalles";
 import { changeStateSyncSalles } from "../../CustomStream/CheckDataChaged";
-import category from "../../Schemas/category";
 import farmer from "../../Schemas/farmer";
 import product from "../../Schemas/product";
 import IProduct from "../../Schemas/Schema Interface/IProduct";
@@ -20,6 +19,9 @@ export async function getAllSalles() {
         }).populate({
             path: "salles.seller_id",
             select: "firstName lastName"
+        }).populate({
+            path: "category",
+            select: "name"
         })
         temp = temp.filter((value) => {
             // value.salles.filter((value)=>{
@@ -169,7 +171,7 @@ export async function updateCount(id: string, value: number) {
         if (await isSallesExist(id)) {
             let data = await product.findOne({ "salles._id": id }) as IProduct
             data.salles = data.salles.filter((value) => value._id == id)
-          
+
             await product.findOneAndUpdate({ "salles._id": id }, {
                 '$set': {
                     "salles.$.count": value + (data.salles[0].count as number)
