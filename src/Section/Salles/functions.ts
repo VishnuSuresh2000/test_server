@@ -66,9 +66,11 @@ export async function getAllSallesForSeller(id: string) {
 
 
 export async function getAllSallesProductByCategory(categoryId: string) {
+    console.log("on the function")
     try {
         let temp = await product.find({
             category: categoryId,
+            "salles.toShow": true
         }).populate({
             path: "salles.farmer_id",
             select: "firstName lastName"
@@ -86,7 +88,7 @@ export async function getAllSallesProductByCategory(categoryId: string) {
         if (temp.length == 0) {
             throw new NoProductForSalles()
         }
-
+    
         return temp
     } catch (error) {
         console.log("error fro getSalles", error)
@@ -202,3 +204,4 @@ export async function toVerifieSalles(id: string, value: boolean) {
         throw error
     }
 }
+

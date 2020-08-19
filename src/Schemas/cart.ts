@@ -1,16 +1,13 @@
 import { Schema, model } from "mongoose";
-import productlist from "./Salles";
+
 import customer from "./customer";
 import Icart from "./Schema Interface/Icart";
 import { paymentProgress } from "./CustomEnum/CartProgress";
 import salles from "./Salles";
+import product from "./product";
 
 
 var cart = new Schema({
-    product_id: {
-        type: Schema.Types.ObjectId,
-        ref: productlist
-    },
     customer_id: {
         type: Schema.Types.ObjectId,
         ref: customer
@@ -45,6 +42,10 @@ var cart = new Schema({
     salles_id: {
         type: Schema.Types.ObjectId,
         ref: salles
+    },
+    product_id: {
+        type: Schema.Types.ObjectId,
+        ref: product
     }
 
 })

@@ -1,8 +1,12 @@
-// import cart from '../../Schemas/cart'
-// import Icart from '../../Schemas/Schema Interface/Icart';
-// import productlist from '../../Schemas/productlist';
-// import customer from '../../Schemas/customer';
-// import { addCartLog } from '../CartLog/function';
+import { AllProductsAreSeled, CountMustDefine, LessAmountOfProduct, ProductIsNotInSalles } from '../../CustomExceptions/CartExceptions';
+import { NoProductFound, ProfileNotFoundOrUnverified } from '../../CustomExceptions/CustomExceptionForSalles';
+import { AlredyExist, NoRecordFound } from '../../CustomExceptions/Custom_Exception';
+import cart from '../../Schemas/cart';
+import customer from '../../Schemas/customer';
+import product from '../../Schemas/product';
+import Icart from '../../Schemas/Schema Interface/Icart';
+import IProduct from '../../Schemas/Schema Interface/IProduct';
+
 
 // export async function readCart(customerid: string) {
 //     try {
@@ -38,7 +42,6 @@
 //         temp = temp.filter((value) => {
 //             var temp = value.toJSON()
 //             return temp.productlist_id.seller_id == sellerid
-
 //         })
 //         if (temp.length == 0) {
 //             throw Error("No iteams Found")
@@ -50,116 +53,151 @@
 //     }
 // }
 
-// export async function isExist(data: Icart) {
-//     try {
-//         let temp = await cart.findOne({ customer_id: data.customer_id, productlist_id: data.productlist_id })
-//         if (temp == null) {
-//             return false
-//         }
-//         return true
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
+export async function isExist(data: Icart) {
+    try {
+        let temp = await cart.findOne({
+            customer_id: data.customer_id,
+            salles_id: data.salles_id, completed: false
+        })
+        if (temp == null) {
+            return false
+        }
+        return true
+    } catch (error) {
+        console.log("Error from isExist", error);
+        throw error
+    }
 
-// }
+}
 
 
-// export async function createCart(data: Icart) {
-//     try {
-//         if (! await isExist(data)) {
-//             let productl = await productlist.findOne({ _id: data.productlist_id })
-//             let custom = await customer.findOne({ _id: data.customer_id })
-//             if (productl == null) {
-//                 throw new Error('Product is Not listed For salles')
-//             } else if (productl.count == 0) {
-//                 throw new Error('All Product are selled')
-//             } else if (productl.count as number < data.count) {
-//                 throw new Error('The product need is higher than the list')
-//             } else if (custom == null) {
-//                 throw new Error('Invalid Customer')
-//             } else if (data.count == null || data.count == 0) {
-//                 throw new Error('Count of the Product Must Define')
-//             } else {
-//                 let temp = new cart(data)
-//                 await temp.save()
-//                 return "Added Product to Cart"
-//             }
+export async function createCart(data: Icart) {
+    try {
+        if (! await isExist(data)) {
+            let productl = await product.findOne({ "salles._id": data.salles_id, _id: data.product_id }) as IProduct
+            let custom = await customer.findOne({ _id: data.customer_id })
+            if (productl == null) {
+                throw new ProductIsNotInSalles()
+            } else if (productl.salles[0].count == 0) {
+                throw new AllProductsAreSeled()
+            } else if (productl.salles[0].count as number < data.count) {
+                throw new LessAmountOfProduct()
+            } else if (custom == null) {
+                throw new ProfileNotFoundOrUnverified("Customer")
+            } else if (data.count == null || data.count == 0) {
+                throw new CountMustDefine()
+            } else {
+                let temp = new cart(data)
+                await temp.save()
+                return "Added Product to Cart"
+            }
+        } else {
+            throw new AlredyExist()
+        }
+    } catch (error) {
+        console.log("Error from createCart",error)
+        throw error
+    }
 
-//         } else {
-//             throw new Error('Already Exist')
-//         }
-//     } catch (error) {
-//         console.log(error)
-//         throw error
-//     }
+}
 
-// }
+export async function isExistid(id: string) {
+    try {
+        let temp = await cart.findOne({ _id: id })
+        if (temp == null) {
+            return false
+        }
+        return true
+    } catch (error) {
+        console.log("Error from isExistid", error);
+        throw error
+    }
+}
 
-// export async function isExistid(id: string) {
-//     try {
-//         let temp = await cart.findOne({ _id: id })
-//         if (temp == null) {
-//             return false
-//         }
-//         return true
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
-// }
+export async function payment(id: string) {
+    try {
+        if (await isExistid(id)) {
+            let temp = await cart.findOne({ _id: id }) as Icart
+            let productWithsalles = await product.findOne({
+                _id: temp.product_id,
+                "salles._id": temp.salles_id
+            }) as IProduct
+            if (temp.count < (productWithsalles.salles[0].count as number)) {
+                await product.findOneAndUpdate({
+                    _id: temp.product_id,
+                    "salles._id": temp.salles_id
+                }, {
+                    '$set': {
+                        "salles.$.count": (productWithsalles.salles[0].count as number) + temp.count
+                    }
+                })
+                await cart.findOneAndUpdate({ _id: id }, {
+                    paymentComplete: true
+                })
+                return "Payment Complted"
+            } else {
+                throw new AllProductsAreSeled()
+            }
+        } else {
+            throw new NoProductFound()
+        }
+    } catch (error) {
+        console.log("Error from payment", error);
+        throw error
+    }
+}
 
-// export async function payment(id: string) {
-//     try {
-//         if (await isExistid(id)) {
-//             let temp = await cart.findByIdAndUpdate(id, { dataOfPayment: new Date(), paymentComplete: true }) as Icart
-//             let count = (await productlist.findOne({ _id: temp.productlist_id }))?.count as number
-//             await productlist.findByIdAndUpdate(temp.productlist_id, { count: count - temp.count })
-//             return "Payment Complted"
-//         } else {
-//             throw new Error('Not Exist')
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
-// }
+export async function cancelOrder(id: string) {
+    try {
+        if (await isExistid(id)) {
+            await addTosallesFromCart(id)
+            await cart.findByIdAndRemove(id)
+            return "Product Is removed from cart"
+        } else {
+            throw new NoRecordFound()
+        }
+    } catch (error) {
+        console.log("Error from cancelOrder",error);
+        throw error
+    }
+}
 
-// export async function cancelOrder(id: string) {
-//     try {
-//         if (await isExistid(id)) {
-//             let temp = await cart.findOne({ _id: id }) as Icart
-//             if (temp.paymentComplete) {
-//                 let count = (await productlist.findOne({ _id: temp.productlist_id }))?.count as number
-//                 await productlist.findByIdAndUpdate(temp.productlist_id, { count: count + temp.count })
-//             }
-//             await cart.findByIdAndRemove(id)
-//             return "Product Is removed from cart"
-//         } else {
-//             throw new Error('Not Exist')
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
-// }
+export async function cancelPayment(id: string) {
+    try {
+        if (await isExistid(id)) {
+            await addTosallesFromCart(id)
+            await cart.findByIdAndUpdate(id, { paymentComplete: false })
+            return "Payment Canceled"
+        } else {
+            throw new NoRecordFound()
+        }
+    } catch (error) {
+        console.log("Error from cancelPayment",error);
+        throw error
+    }
+}
 
-// export async function cancelPayment(id: string) {
-//     try {
-//         if (await isExistid(id)) {
-//             let temp = await cart.findOne({ _id: id }) as Icart
-//             let count = (await productlist.findOne({ _id: temp.productlist_id }))?.count as number
-//             await productlist.findByIdAndUpdate(temp.productlist_id, { count: count + temp.count })
-//             await cart.findByIdAndUpdate(id, { paymentComplete: false })
-//             return "Payment Canceled"
-//         } else {
-//             throw new Error('Not Exist')
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
-// }
+async function addTosallesFromCart(id: string) {
+    try {
+        let temp = await cart.findOne({ _id: id }) as Icart
+        let productWithsalles = await product.findOne({
+            _id: temp.product_id,
+            "salles._id": temp.salles_id
+        }) as IProduct
+        await product.findOneAndUpdate({
+            _id: temp.product_id,
+            "salles._id": temp.salles_id
+        }, {
+            '$set': {
+                "salles.$.count": (productWithsalles.salles[0].count as number) + temp.count
+            }
+        })
+    } catch (error) {
+        console.log("Error from addTosallesFromCart",error);
+        throw error
+    }
+}
+
 
 // export async function compltedDelivary(id: string) {
 //     try {
@@ -201,21 +239,18 @@
 //     }
 // }
 
-// export async function adminView() {
-//     try {
-//         let temp = await cart.find({ paymentComplete: true }).populate({
-//             path: 'productlist_id',
-//             populate: {
-//                 path: 'product_id',
-//                 select: 'name'
-//             },
-//         }).populate('customer_id')
-//         if (temp.length == 0) {
-//             throw Error("No iteams Found")
-//         }
-//         return temp;
-//     } catch (error) {
-//         console.log(error);
-//         throw error
-//     }
-// }
+export async function adminView() {
+    try {
+        let temp = await cart.find({ paymentComplete: true }).populate({
+            path: 'salles_id',
+
+        }).populate('customer_id')
+        if (temp.length == 0) {
+            throw new NoRecordFound()
+        }
+        return temp;
+    } catch (error) {
+        console.log("Error from admin view", error);
+        throw error
+    }
+}

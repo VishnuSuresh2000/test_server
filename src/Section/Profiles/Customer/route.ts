@@ -3,19 +3,23 @@ import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
 import customer from "../../../Schemas/customer";
 import { outFunction } from "../../functions";
+import { customerSectionSalles } from "../../Salles/route";
 import { addAddress, addIfProfileNotExistFirebase, checkHasAddress } from "../functions";
 
 var router = Router()
 
 router.use(checkIfAuthenticated)
 router.use(userInformation(customer))
+
+customerSectionSalles(router)
+
 router.post('/create', async (req: Request, res: Response) => {
     console.log(res.locals.firebase_id)
     outFunction(res, addIfProfileNotExistFirebase(req.body, res.locals.firebase_id, customer))
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {
-    outFunction(res,Promise.resolve(true))
+    outFunction(res, Promise.resolve(true))
 })
 
 router.get("/hasAddress", async (_req: Request, res: Response) => {
@@ -25,7 +29,7 @@ router.get("/hasAddress", async (_req: Request, res: Response) => {
 
 router.put('/addAddress', async (req: Request, res: Response) => {
     console.log("user id from middleware ", res.locals.userId)
-    outFunction(res,  addAddress(res.locals.userId, req.body, customer))
+    outFunction(res, addAddress(res.locals.userId, req.body, customer))
 })
 
 
