@@ -103,11 +103,24 @@ export async function addIfProfileNotExistFirebase(data: ICommonProfile, firebas
         console.log(firebase_id, "from function", "\n", data)
         let res = await model.findOne({ firebase_id: firebase_id })
         let res2 = await model.findOne({ phoneNumber: data.phoneNumber })
-        if (res == null && res2 == null) {
+        // let res3 = await model.findOne({
+        //     phoneNumber: data.phoneNumber, email: data.email, firstName: data.firstName,
+        //     lastName: data.lastName
+        // })
+        if (res == null && res2 == null ) {
             let temp = new model(data)
             await temp.save()
             return "Added Profile"
-        } else if (res2 != null) {
+        } 
+        // else if (res3 != null) {
+        //     console.log(res3)
+        //     // await model.findOneAndUpdate({ _id: res3._id }, {
+        //     //     firebase_id: data.firebase_id
+        //     // })
+        //     console.log("Alredy exist with different Email id")
+        //     return "Profile Data Upadted"
+        // }
+        else if (res2 != null) {
             console.log(res2)
             throw new AlreadyExistPhoneNumber()
         }

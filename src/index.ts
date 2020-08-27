@@ -6,6 +6,7 @@ import dbconnection from './DataBase/connection'
 import checkIfAuthenticated from './MiddleWare/Auth/auth'
 import allRoutesBeru from './Route/AllRouteBeru'
 import syncWebSocket from './WebSocket/websocket'
+import invoiceTest from "./PdfGenerator/CreateInvoice";
 
 
 dbconnection()
@@ -38,6 +39,10 @@ allRoutesBeru(app)
 app.get('/', (_req: Request, res: Response) => {
     res.locals.test="test"
     res.send("Test Sections")
+})
+app.get('/testPdf', (_req: Request, res: Response) => {
+    console.log("on test pdf")
+    invoiceTest(res)
 })
 
 app.get('/test',checkIfAuthenticated, (_req: Request, res: Response) => {

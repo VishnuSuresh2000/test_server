@@ -1,5 +1,6 @@
 export enum paymentProgress{
     onProgress="onProgress",
-    Packed="packed",
+    packed="packed",
     onDelivary="onDelivary",
+    deliverd="deliverd"
 }

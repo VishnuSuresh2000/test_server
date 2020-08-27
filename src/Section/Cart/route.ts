@@ -1,8 +1,39 @@
-// import { Router, Response, Request } from 'express'
-// import { outFunction } from '../functions'
-// import { readCart, createCart, payment, cancelPayment, sellerCart, compltedDelivary, adminView } from './function'
+import { Request, Response, Router } from 'express'
+import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress'
+import Icart from '../../Schemas/Schema Interface/Icart'
+import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes'
+import { outFunction } from '../functions'
+import { addDelivaryDate, addProgress, createCart, readCart, sellerCart } from './function'
 
-// var route = Router()
+export var route = Router()
+
+route.get('/test/:id', async (req: Request, res: Response) => {
+    outFunction(res, addDelivaryDate(req.params.id,req.body.date))
+})
+
+export function customerSectionForCart(route: Router) {
+    route.get('/cart/data', async (_req: Request, res: Response) => {
+        outFunction(res, readCart(res.locals.userId))
+    })
+    route.post('/cart/add', async (req: Request, res: Response) => {
+        let data: Icart = req.body
+        data.customer_id = res.locals.userId
+        outFunction(res, createCart(data))
+    })
+}
+
+export function sellerSctionForCart(route: Router) {
+    route.get('/cart/data', async (_req: Request, res: Response) => {
+        outFunction(res, sellerCart(res.locals.userId))
+    })
+    route.put('/updateProgress/:id', async (req: Request, res: Response) => {
+        let temp: IProgressNote = req.body
+        temp.progress = (<any>paymentProgress)[req.body.progress]
+        console.log("data from it ", temp)
+        outFunction(res, addProgress(req.params.id, temp))
+    })
+}
+
 
 // route.get('/adminView',async (_req:Request, res: Response) => {
 //     await outFunction(res, async () => await adminView())
@@ -32,4 +63,4 @@
 // })
 
 
-// export default route
+

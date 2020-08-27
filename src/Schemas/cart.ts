@@ -1,13 +1,12 @@
-import { Schema, model } from "mongoose";
-
-import customer from "./customer";
-import Icart from "./Schema Interface/Icart";
+import { model, Schema } from "mongoose";
 import { paymentProgress } from "./CustomEnum/CartProgress";
-import salles from "./Salles";
+import customer from "./customer";
 import product from "./product";
+import ProgessNote from "./ProgessNote";
+import Icart from "./Schema Interface/Icart";
 
 
-var cart = new Schema({
+var cart = new Schema<Icart>({
     customer_id: {
         type: Schema.Types.ObjectId,
         ref: customer
@@ -26,6 +25,9 @@ var cart = new Schema({
     dataOfPayment: {
         type: Date
     },
+    dataOfDalivary: {
+        type: Date
+    },
     paymentComplete: {
         type: Boolean,
         default: false
@@ -36,16 +38,25 @@ var cart = new Schema({
     },
     progress: {
         type: String,
-        enum: paymentProgress,
         default: paymentProgress.onProgress
     },
     salles_id: {
         type: Schema.Types.ObjectId,
-        ref: salles
     },
     product_id: {
         type: Schema.Types.ObjectId,
         ref: product
+    },
+    totalAmount: {
+        type: Number,
+        default: 0
+    },
+    cancel: {
+        type: Boolean,
+        default: false
+    },
+    progressNotes: {
+        type: [ProgessNote]
     }
 
 })

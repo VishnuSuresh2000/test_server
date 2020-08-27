@@ -38,20 +38,6 @@ export async function getProductByCategory(id: string) {
     }
 }
 
-
-interface InputProduct {
-    _id: string
-    name: string,
-    description: string,
-    category: {
-        name: string,
-        _id: string
-    },
-    inKg: boolean
-}
-
-
-
 export async function isProductExist(idOrName: boolean, data: string) {
     try {
         let temp = idOrName ? { _id: data } : { name: data.toLowerCase() }
@@ -67,7 +53,7 @@ export async function isProductExist(idOrName: boolean, data: string) {
 
 }
 
-export async function addProduct(data: InputProduct) {
+export async function addProduct(data: IProduct) {
     try {
         var check = await isProductExist(false, data.name)
         if (!check) {
@@ -118,15 +104,7 @@ export async function readSingleProduct(id: string) {
         var response = await product.findOne({ _id: id })
         if (response != null) {
             let temp = await category.findById(response?.category);
-            let out = {
-                _id: response?._id,
-                name: response?.name,
-                category: temp?._id,
-                description: response?.description,
-                inKg: response.inKg,
-                amount: response.amount
-            }
-            return out
+            return temp
         }
         throw new NoRecordFound()
     } catch (error) {
