@@ -1,6 +1,7 @@
 import { AllProductsAreSeled, CountMustDefine, LessAmountOfProduct, ProductIsNotInSalles } from '../../CustomExceptions/CartExceptions';
 import { NoProductFound, ProfileNotFoundOrUnverified } from '../../CustomExceptions/CustomExceptionForSalles';
 import { AlredyExist, NoRecordFound } from '../../CustomExceptions/Custom_Exception';
+import { changeStateSyncCart } from '../../CustomStream/CheckDataChaged';
 import cart from '../../Schemas/cart';
 import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress';
 import customer from '../../Schemas/customer';
@@ -18,8 +19,12 @@ export async function readCart(customerid: string) {
             cancel: false, completed: false,
         })
             .populate({
-                path: 'product_id',
-                select: "name amount inKg"
+                path: "product_id",
+                populate: {
+                    path: "category",
+                    select: "name"
+                },
+                select: "name inKg category hasImg",
             })
         let fun = async (value: Icart) => {
             var temp = value.toJSON()
@@ -66,19 +71,29 @@ export async function sellerCart(sellerid: string) {
                 completed: false
             }).populate({
                 path: "product_id",
-                select: "name"
+                populate: {
+                    path: "category",
+                    select: "name"
+                },
+                select: "name inKg category hasImg",
+            }).populate({
+                path: 'customer_id',
+                select: 'firstName lastName address.pinCode',
+
             })
+            // console.log("user data ", temp)
             tem.forEach((value) => carts.push(value))
         }
         let fun = async (value: Icart) => {
             var temp = value.toJSON()
             let produ = await product.findOne({ "salles._id": value.salles_id })
-                .select("salles.farmer_id salles._id") as IProduct
-            let user = await customer.findOne({ _id: value.customer_id }).select("firstName lastName")
+                .populate({
+                    path: "salles.farmer_id",
+                    select: "firstName lastName"
+                }).select("salles._id salles.farmer_id") as IProduct
+            // let user = await customer.findOne({ _id: value.customer_id }).select("firstName lastName")
             temp.salles_id = produ.salles[0] as ISalles
-            temp.customer_id = user
-
-
+            // temp.customer_id = user
             return await temp
         }
         let data = await Promise.all(carts.map(async (value) => {
@@ -87,6 +102,7 @@ export async function sellerCart(sellerid: string) {
         if (data.length == 0) {
             throw new NoRecordFound()
         }
+        // console.log("data : ", data)
         return data;
     } catch (error) {
         console.log(error);
@@ -131,6 +147,7 @@ export async function createCart(data: Icart) {
                 data.totalAmount = productl.amount * data.count;
                 let temp = new cart(data)
                 await temp.save()
+                // changeStateSyncCart.push("true")
                 return "Added Product to Cart"
             }
         } else {
@@ -178,6 +195,7 @@ export async function payment(id: string) {
                     paymentComplete: true,
                     dataOfPayment: new Date()
                 })
+                changeStateSyncCart.push("true")
                 return "Payment Complted"
             } else {
                 throw new AllProductsAreSeled()
@@ -196,6 +214,7 @@ export async function removeOrder(id: string) {
         if (await isExistid(id)) {
             await addTosallesFromCart(id)
             await cart.findByIdAndRemove(id)
+            changeStateSyncCart.push("true")
             return "Product Is removed from cart"
         } else {
             throw new NoRecordFound()
@@ -211,6 +230,7 @@ export async function cancelPayment(id: string) {
         if (await isExistid(id)) {
             await addTosallesFromCart(id)
             await cart.findByIdAndUpdate(id, { paymentComplete: false })
+            changeStateSyncCart.push("true")
             return "Payment Canceled"
         } else {
             throw new NoRecordFound()
@@ -226,6 +246,7 @@ export async function cancelOrder(id: string) {
         if (await isExistid(id)) {
             await addTosallesFromCart(id)
             await cart.findByIdAndUpdate(id, { paymentComplete: false, cancel: true })
+            changeStateSyncCart.push("true")
             return "Payment Canceled"
         } else {
             throw new NoRecordFound()
@@ -260,7 +281,8 @@ async function addTosallesFromCart(id: string) {
 }
 
 export async function addProgress(id: string, data: IProgressNote) {
-    data.data = new Date()
+    data.date = new Date()
+    // console.log("progress note ",data)
     try {
         if (await isExistid(id)) {
             await cart.findOneAndUpdate({ _id: id }, {
@@ -268,6 +290,7 @@ export async function addProgress(id: string, data: IProgressNote) {
                     progressNotes: data
                 }
             })
+            changeStateSyncCart.push("true")
             return "Add THe progress"
         } else {
             throw new NoRecordFound()
@@ -286,6 +309,7 @@ export async function addDelivaryDate(id: string, date: string) {
                 dataOfDalivary: new Date(date)
             })
             console.log("Date after parse ", new Date(date).toUTCString())
+            changeStateSyncCart.push("true")
             return "Add Delivary Date"
         } else {
             throw new NoRecordFound()
@@ -311,8 +335,8 @@ export async function delivaryCompleted(id: string) {
                     progressNotes: note
                 }
             })
-
-            return "Add Delivary Date"
+            changeStateSyncCart.push("true")
+            return "Delivary Completed"
         } else {
             throw new NoRecordFound()
         }

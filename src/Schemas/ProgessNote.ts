@@ -10,7 +10,7 @@ var progressNote = new Schema<IProgressNote>({
         type: Date,
         required: true
     },
-    massage: {
+    message: {
         type: String,
         required: true
     }

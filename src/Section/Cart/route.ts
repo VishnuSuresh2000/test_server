@@ -8,7 +8,10 @@ import { addDelivaryDate, addProgress, createCart, readCart, sellerCart } from '
 export var route = Router()
 
 route.get('/test/:id', async (req: Request, res: Response) => {
-    outFunction(res, addDelivaryDate(req.params.id,req.body.date))
+    let temp: IProgressNote = req.body
+    temp.progress = (<any>paymentProgress)[req.body.progress]
+    console.log("data from it ", temp)
+    outFunction(res, addProgress(req.params.id, temp))
 })
 
 export function customerSectionForCart(route: Router) {
@@ -26,12 +29,17 @@ export function sellerSctionForCart(route: Router) {
     route.get('/cart/data', async (_req: Request, res: Response) => {
         outFunction(res, sellerCart(res.locals.userId))
     })
-    route.put('/updateProgress/:id', async (req: Request, res: Response) => {
+    route.put('/cart/addNote/:id', async (req: Request, res: Response) => {
         let temp: IProgressNote = req.body
         temp.progress = (<any>paymentProgress)[req.body.progress]
-        console.log("data from it ", temp)
+        // console.log("data from it ", temp)
         outFunction(res, addProgress(req.params.id, temp))
     })
+    route.put('/cart/updateDelivaryDate/:id',
+        async (req: Request, res: Response) => {
+            outFunction(res, addDelivaryDate(req.params.id, req.body.date))
+        })
+    
 }
 
 

@@ -201,3 +201,17 @@ export async function getAllData(model: Model<ICommonProfile>) {
         throw error
     }
 }
+
+
+export async function getAllDataMinimal(model: Model<ICommonProfile>) {
+    try {
+        let value = await model.find().select("firstName lastName")
+        if (value.length == 0) {
+            throw new NoRecordFound()
+        }
+        return value;
+    } catch (error) {
+        console.log("error on  getAllData", error)
+        throw error
+    }
+}

@@ -88,7 +88,7 @@ export async function getAllSallesProductByCategory(categoryId: string) {
         if (temp.length == 0) {
             throw new NoProductForSalles()
         }
-    
+
         return temp
     } catch (error) {
         console.log("error fro getSalles", error)
@@ -122,6 +122,7 @@ export async function addToSalles(productId: string, data: ISalles) {
                     }
                 })
                 listernChngesAndSync()
+                // console.log("added to salles with data ", data)
                 return "Added the salles"
             }
         } else {

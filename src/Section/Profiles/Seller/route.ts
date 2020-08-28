@@ -1,11 +1,13 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import checkIsAdmin from "../../../MiddleWare/Auth/CheckIsAdmin";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
 import ICommonProfile from "../../../Schemas/Schema Interface/ICommonProfile";
 import seller from "../../../Schemas/seller";
+import { sellerSctionForCart } from "../../Cart/route";
 import { outFunction } from "../../functions";
 import { sallesSectionForSeller } from "../../Salles/route";
+import { customerMinimalData } from "../Customer/route";
 import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverified, getAllData, Verifie } from "../functions";
 
 var router = Router()
@@ -34,6 +36,8 @@ router.use(userInformation(seller))
 //     next()
 // })
 sallesSectionForSeller(router)
+sellerSctionForCart(router)
+customerMinimalData(router)
 // router.use(function(req:Request,res:Response,next:NextFunction){
 //     console.log("down salles");
 //     next()
