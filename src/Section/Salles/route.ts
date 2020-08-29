@@ -11,9 +11,9 @@ import { addToSalles, getAllSalles, getAllSallesForSeller, getAllSallesProductBy
 
 export var router = Router()
 
-// router.get('/dataOfSalles/:id', async (req: Request, res: Response) => {
-//     outFunction(res, getAllSallesForSeller(req.params.id))
-// })
+router.get('/test', async (_req: Request, res: Response) => {
+    outFunction(res, getAllSalles())
+})
 
 // router.post('/addSalles/:id', async (req: Request, res: Response) => {
 //     outFunction(res, addToSalles(req.params.id, req.body))
@@ -55,7 +55,6 @@ export function customerSectionSalles(router: Router) {
         outFunction(res, getAllSalles())
     })
     router.get("/salles/dataByCategory/:id", (req: Request, res: Response) => {
-        
         outFunction(res, getAllSallesProductByCategory(req.params.id))
     })
 }
