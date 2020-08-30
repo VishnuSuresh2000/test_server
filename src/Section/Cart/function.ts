@@ -261,7 +261,7 @@ export async function addMultiProductTobag(carts: Icart[], customerId: string) {
         for (var i in carts) {
             try {
                 var data: Icart = carts[i]
-                console.log("each cart ", carts[i])
+                // console.log("each cart ", carts[i])
                 data.customer_id = Types.ObjectId(customerId)
                 if (carts[i]._id == null) {
                     let res = await createCart(data)
