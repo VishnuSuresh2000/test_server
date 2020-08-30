@@ -3,25 +3,31 @@ import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress'
 import Icart from '../../Schemas/Schema Interface/Icart'
 import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes'
 import { outFunction } from '../functions'
-import { addDelivaryDate, addProgress, createCart, readCart, sellerCart } from './function'
+import { addDelivaryDate, addMultiProductTobag, addProgress, createCart, readCart, readCartLog, sellerCart } from './function'
 
 export var route = Router()
 
 route.get('/test/:id', async (req: Request, res: Response) => {
-    let temp: IProgressNote = req.body
-    temp.progress = (<any>paymentProgress)[req.body.progress]
-    console.log("data from it ", temp)
-    outFunction(res, addProgress(req.params.id, temp))
+    outFunction(res, addMultiProductTobag(req.body, req.params.id))
 })
 
 export function customerSectionForCart(route: Router) {
     route.get('/cart/data', async (_req: Request, res: Response) => {
-        outFunction(res, readCart(res.locals.userId))
+        outFunction(res, readCart(res.locals.userId, false))
+    })
+    route.get('/cartOrders/data', async (_req: Request, res: Response) => {
+        outFunction(res, readCart(res.locals.userId, true))
+    })
+    route.get('/cartLog/data', async (_req: Request, res: Response) => {
+        outFunction(res, readCartLog(res.locals.userId))
     })
     route.post('/cart/add', async (req: Request, res: Response) => {
         let data: Icart = req.body
         data.customer_id = res.locals.userId
         outFunction(res, createCart(data))
+    })
+    route.post('/cart/addMultiCart', async (req: Request, res: Response) => {
+        outFunction(res, addMultiProductTobag(req.body, res.locals.userId))
     })
 }
 
@@ -39,7 +45,7 @@ export function sellerSctionForCart(route: Router) {
         async (req: Request, res: Response) => {
             outFunction(res, addDelivaryDate(req.params.id, req.body.date))
         })
-    
+
 }
 
 

@@ -1,6 +1,7 @@
+import { Types } from "mongoose";
 import { AllProductsAreSeled, CountMustDefine, LessAmountOfProduct, ProductIsNotInSalles } from '../../CustomExceptions/CartExceptions';
 import { NoProductFound, ProfileNotFoundOrUnverified } from '../../CustomExceptions/CustomExceptionForSalles';
-import { AlredyExist, NoRecordFound } from '../../CustomExceptions/Custom_Exception';
+import { AlredyExistError, NoRecordFound } from '../../CustomExceptions/Custom_Exception';
 import { changeStateSyncCart } from '../../CustomStream/CheckDataChaged';
 import cart from '../../Schemas/cart';
 import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress';
@@ -12,11 +13,13 @@ import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes';
 import ISalles from '../../Schemas/Schema Interface/ISalles';
 
 
-export async function readCart(customerid: string) {
+
+export async function readCart(customerid: string, paymentComplete: boolean) {
     try {
         let temp = await cart.find({
             customer_id: customerid,
             cancel: false, completed: false,
+            paymentComplete: paymentComplete,
         })
             .populate({
                 path: "product_id",
@@ -30,9 +33,7 @@ export async function readCart(customerid: string) {
             var temp = value.toJSON()
             let produ = await product.findOne({ "salles._id": value.salles_id })
                 .select("salles.farmer_id salles.seller_id salles._id") as IProduct
-
             temp.salles_id = produ.salles[0] as ISalles
-
             return await temp
         }
         let data = await Promise.all(temp.map(async (value) => {
@@ -47,6 +48,45 @@ export async function readCart(customerid: string) {
         throw error
     }
 }
+
+export async function readCartLog(customerid: string) {
+    try {
+        let temp = await cart.find({
+            customer_id: customerid,
+
+        })
+            .populate({
+                path: "product_id",
+                populate: {
+                    path: "category",
+                    select: "name"
+                },
+                select: "name inKg category hasImg",
+            })
+        temp = temp.filter((value) => {
+            return (value.completed == true) || (value.cancel == true)
+        })
+        let fun = async (value: Icart) => {
+            var temp = value.toJSON()
+            let produ = await product.findOne({ "salles._id": value.salles_id })
+                .select("salles.farmer_id salles.seller_id salles._id") as IProduct
+            temp.salles_id = produ.salles[0] as ISalles
+            return await temp
+        }
+        let data = await Promise.all(temp.map(async (value) => {
+            return await fun(value)
+        }))
+        if (data.length == 0) {
+            throw new NoRecordFound()
+        }
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw error
+    }
+}
+
+
 
 
 export async function sellerCart(sellerid: string) {
@@ -110,11 +150,30 @@ export async function sellerCart(sellerid: string) {
     }
 }
 
-export async function isExist(data: Icart) {
+// export async function isExist(data: Icart) {
+//     try {
+//         let temp = await cart.findOne({
+//             customer_id: data.customer_id,
+//             salles_id: data.salles_id, completed: false
+//         })
+//         if (temp == null) {
+//             return false
+//         }
+//         return true
+//     } catch (error) {
+//         console.log("Error from isExist", error);
+//         throw error
+//     }
+
+// }
+
+export async function isExistForCreate(data: Icart) {
     try {
         let temp = await cart.findOne({
             customer_id: data.customer_id,
-            salles_id: data.salles_id, completed: false
+            salles_id: data.salles_id, completed: false,
+            cancel: false,
+            paymentComplete: false,
         })
         if (temp == null) {
             return false
@@ -130,7 +189,7 @@ export async function isExist(data: Icart) {
 
 export async function createCart(data: Icart) {
     try {
-        if (! await isExist(data)) {
+        if (! await isExistForCreate(data)) {
             let productl = await product.findOne({ "salles._id": data.salles_id, }) as IProduct
             let custom = await customer.findOne({ _id: data.customer_id })
             if (productl == null) {
@@ -147,11 +206,97 @@ export async function createCart(data: Icart) {
                 data.totalAmount = productl.amount * data.count;
                 let temp = new cart(data)
                 await temp.save()
-                // changeStateSyncCart.push("true")
+                changeStateSyncCart.push("true")
                 return "Added Product to Cart"
             }
         } else {
-            throw new AlredyExist()
+            throw new AlredyExistError()
+        }
+    } catch (error) {
+        console.log("Error from createCart", error)
+        throw error
+    }
+
+}
+
+
+export async function updateCountInCart(id: string, count: number) {
+    try {
+        if (await isExistid(id)) {
+            let tempCart = await cart.findOne({ _id: id }) as Icart
+            let productl = await product.findOne({
+                "salles._id": tempCart.salles_id,
+                _id: tempCart.product_id
+            }) as IProduct
+            // console.log("product in salles", productl.salles[0])
+            // console.log("total added ", (tempCart.count + count))
+            // console.log("the condition ", (tempCart.count + count) > (productl.salles[0].count as number))
+            if ((tempCart.count + count) <= (productl.salles[0].count as number)) {
+                await cart.findOneAndUpdate({ _id: id }, {
+                    count: (tempCart.count + count),
+                    totalAmount: (tempCart.count + count) * productl.amount
+                })
+                changeStateSyncCart.push("true")
+                return "Updated Count"
+            } else {
+                throw new LessAmountOfProduct()
+            }
+        } else {
+            throw new NoRecordFound()
+        }
+    } catch (error) {
+        console.log("Error from createCart", error)
+        throw error
+    }
+}
+
+
+export async function addMultiProductTobag(carts: Icart[], customerId: string) {
+    var totalAdded: number = 0;
+    var addflag: string = "Added Product to Cart"
+    var updateFlag: string = "Updated Count"
+    var totalUpdated: number = 0
+    var errorlist = Array<{ cart: Icart, error: Error }>()
+    try {
+        for (var i in carts) {
+            try {
+                var data: Icart = carts[i]
+                console.log("each cart ", carts[i])
+                data.customer_id = Types.ObjectId(customerId)
+                if (carts[i]._id == null) {
+                    let res = await createCart(data)
+                    if (addflag == res) {
+                        totalAdded += 1
+                    }
+                } else {
+                    let res = await updateCountInCart(carts[i]._id, carts[i].count)
+                    if (updateFlag == res) {
+                        totalUpdated += 1
+                    }
+                }
+            } catch (error) {
+                // console.log("test exception ", error instanceof Error)
+                // console.log("test exception ", error instanceof AlredyExistError)
+                if (error instanceof AlredyExistError) {
+                    console.log("checked the instance of already exist")
+                    carts[i]._id = (await cart.findOne({
+                        customer_id: carts[i].customer_id,
+                        salles_id: carts[i].salles_id, completed: false,
+                        cancel: false,
+                        paymentComplete: false,
+                    }))?._id
+                }
+                // console.log("Error on addMultiProductTobag ", error)
+                errorlist.push({
+                    cart: carts[i],
+                    error: error
+                })
+            }
+        }
+        return {
+            "added": totalAdded,
+            "updated": totalUpdated,
+            "error": errorlist
         }
     } catch (error) {
         console.log("Error from createCart", error)

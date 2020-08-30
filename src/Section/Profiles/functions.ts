@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { AlreadyExistPhoneNumber, AlredyExist, NoRecordFound, NoUserFound } from "../../CustomExceptions/Custom_Exception";
+import { AlreadyExistPhoneNumber, AlredyExistError, NoRecordFound, NoUserFound } from "../../CustomExceptions/Custom_Exception";
 import IAddress from "../../Schemas/Schema Interface/IAddress";
 import ICommonProfile from "../../Schemas/Schema Interface/ICommonProfile";
 
@@ -17,7 +17,7 @@ export async function addIfProfileNotExist(data: ICommonProfile, firebase_id: st
             console.log(res2)
             throw new AlreadyExistPhoneNumber()
         }
-        throw new AlredyExist()
+        throw new AlredyExistError()
     } catch (error) {
         console.log("error on isProfileExist", error)
         throw error
@@ -124,7 +124,7 @@ export async function addIfProfileNotExistFirebase(data: ICommonProfile, firebas
             console.log(res2)
             throw new AlreadyExistPhoneNumber()
         }
-        throw new AlredyExist()
+        throw new AlredyExistError()
     } catch (error) {
         console.log("error on isProfileExist", error)
         throw error

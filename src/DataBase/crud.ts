@@ -1,5 +1,5 @@
 import { Model, Document } from 'mongoose'
-import { AlredyExist, NoRecordFound } from '../CustomExceptions/Custom_Exception'
+import { AlredyExistError, NoRecordFound } from '../CustomExceptions/Custom_Exception'
 
 class CRUD {
     _model: Model<Document>
@@ -15,7 +15,7 @@ class CRUD {
                 await temp.save()
                 return "Record added"
             } else {
-                throw new AlredyExist()
+                throw new AlredyExistError()
             }
         } catch (error) {
             console.log("error from addData Crud", error)
