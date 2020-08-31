@@ -107,11 +107,11 @@ export async function addIfProfileNotExistFirebase(data: ICommonProfile, firebas
         //     phoneNumber: data.phoneNumber, email: data.email, firstName: data.firstName,
         //     lastName: data.lastName
         // })
-        if (res == null && res2 == null ) {
+        if (res == null && res2 == null) {
             let temp = new model(data)
             await temp.save()
             return "Added Profile"
-        } 
+        }
         // else if (res3 != null) {
         //     console.log(res3)
         //     // await model.findOneAndUpdate({ _id: res3._id }, {
@@ -212,6 +212,20 @@ export async function getAllDataMinimal(model: Model<ICommonProfile>) {
         return value;
     } catch (error) {
         console.log("error on  getAllData", error)
+        throw error
+    }
+}
+
+export async function getUserData(id: string, model: Model<ICommonProfile>) {
+    try {
+        if (await isExistWithId(id, model)) {
+            let value = await model.findOne({ _id: id }) as ICommonProfile
+            return value
+        } else {
+            throw new NoUserFound()
+        }
+    } catch (error) {
+        console.log("error on getUserData", error)
         throw error
     }
 }

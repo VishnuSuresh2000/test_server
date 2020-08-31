@@ -5,7 +5,7 @@ import customer from "../../../Schemas/customer";
 import { customerSectionForCart } from "../../Cart/route";
 import { outFunction } from "../../functions";
 import { customerSectionSalles } from "../../Salles/route";
-import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, getAllDataMinimal } from "../functions";
+import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, getAllDataMinimal, getUserData } from "../functions";
 
 var router = Router()
 // router.use(function(req:Request,res:Response,next:NextFunction){
@@ -46,6 +46,10 @@ export function customerMinimalData(route: Router) {
         outFunction(res, getAllDataMinimal(customer))
     })
 }
+
+router.get('/userData', async (_req: Request, res: Response) => {
+    outFunction(res, getUserData(res.locals.userId, customer))
+})
 
 // router.get('/',async(_req:Request,res:Response)=>{
 //     outFunction(res, async () => crud.read())
