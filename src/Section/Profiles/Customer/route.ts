@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
 import customer from "../../../Schemas/customer";
@@ -8,10 +8,20 @@ import { customerSectionSalles } from "../../Salles/route";
 import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, getAllDataMinimal } from "../functions";
 
 var router = Router()
-
+// router.use(function(req:Request,res:Response,next:NextFunction){
+//     console.log("in the route")
+//     next()
+// })
 router.use(checkIfAuthenticated)
+// router.use(function(req:Request,res:Response,next:NextFunction){
+//     console.log("check auth")
+//     next()
+// })
 router.use(userInformation(customer))
-
+// router.use(function(req:Request,res:Response,next:NextFunction){
+//     console.log("get the user")
+//     next()
+// })
 customerSectionSalles(router)
 customerSectionForCart(router)
 

@@ -11,6 +11,7 @@ import Icart from '../../Schemas/Schema Interface/Icart';
 import IProduct from '../../Schemas/Schema Interface/IProduct';
 import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes';
 import ISalles from '../../Schemas/Schema Interface/ISalles';
+import { updateCount } from "../Salles/functions";
 
 
 
@@ -187,7 +188,24 @@ export async function isExistForCreate(data: Icart) {
 }
 
 
-export async function createCart(data: Icart) {
+export async function checkAddOrUpdate(data: Icart) {
+    try {
+        // console.log("Data from user ", data)
+        if (data?._id == null) {
+            // console.log("Add to cart")
+            return await createCart(data);
+        } else {
+            // console.log("Add to orders")
+            return await updateCountInCart(data._id, data.count, data.paymentComplete)
+        }
+    } catch (error) {
+        console.log("Error from checkAddOrUpdate", error)
+        throw error
+    }
+}
+
+
+async function createCart(data: Icart) {
     try {
         if (! await isExistForCreate(data)) {
             let productl = await product.findOne({ "salles._id": data.salles_id, }) as IProduct
@@ -220,10 +238,10 @@ export async function createCart(data: Icart) {
 }
 
 
-export async function updateCountInCart(id: string, count: number) {
+async function updateCountInCart(id: string, count: number, payed: boolean) {
     try {
-        if (await isExistid(id)) {
-            let tempCart = await cart.findOne({ _id: id }) as Icart
+        let tempCart = await cart.findOne({ _id: id }) as Icart
+        if (tempCart != null) {
             let productl = await product.findOne({
                 "salles._id": tempCart.salles_id,
                 _id: tempCart.product_id
@@ -234,7 +252,8 @@ export async function updateCountInCart(id: string, count: number) {
             if ((tempCart.count + count) <= (productl.salles[0].count as number)) {
                 await cart.findOneAndUpdate({ _id: id }, {
                     count: (tempCart.count + count),
-                    totalAmount: (tempCart.count + count) * productl.amount
+                    totalAmount: (tempCart.count + count) * productl.amount,
+                    paymentComplete: payed,
                 })
                 changeStateSyncCart.push("true")
                 return "Updated Count"
@@ -245,7 +264,7 @@ export async function updateCountInCart(id: string, count: number) {
             throw new NoRecordFound()
         }
     } catch (error) {
-        console.log("Error from createCart", error)
+        console.log("Error from updateCart", error)
         throw error
     }
 }
@@ -269,7 +288,7 @@ export async function addMultiProductTobag(carts: Icart[], customerId: string) {
                         totalAdded += 1
                     }
                 } else {
-                    let res = await updateCountInCart(carts[i]._id, carts[i].count)
+                    let res = await updateCountInCart(carts[i]._id, carts[i].count, false)
                     if (updateFlag == res) {
                         totalUpdated += 1
                     }

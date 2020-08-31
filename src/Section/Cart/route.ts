@@ -3,7 +3,7 @@ import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress'
 import Icart from '../../Schemas/Schema Interface/Icart'
 import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes'
 import { outFunction } from '../functions'
-import { addDelivaryDate, addMultiProductTobag, addProgress, createCart, readCart, readCartLog, sellerCart } from './function'
+import { addDelivaryDate, addMultiProductTobag, addProgress, checkAddOrUpdate, readCart, readCartLog, sellerCart } from './function'
 
 export var route = Router()
 
@@ -24,7 +24,7 @@ export function customerSectionForCart(route: Router) {
     route.post('/cart/add', async (req: Request, res: Response) => {
         let data: Icart = req.body
         data.customer_id = res.locals.userId
-        outFunction(res, createCart(data))
+        outFunction(res, checkAddOrUpdate(data))
     })
     route.post('/cart/addMultiCart', async (req: Request, res: Response) => {
         outFunction(res, addMultiProductTobag(req.body, res.locals.userId))
