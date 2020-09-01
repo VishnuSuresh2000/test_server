@@ -24,8 +24,8 @@ export async function getProductByCategory(id: string) {
     try {
         var response = await product.find({ category: id })
             .populate({
-                path:'category',
-                select:["name","_id"]
+                path: 'category',
+                select: ["name", "_id"]
             })
             .select(['category', '_id', 'name', 'amount'])
         if (response.length != 0) {
@@ -79,16 +79,8 @@ export async function updateProduct(id: string, data: IProduct) {
         let check = await isProductExist(true, id)
         if (check) {
             let res = await category.findOne(data.category) as ICategory
-            await product.findByIdAndUpdate(id,
-                {
-                    name: data.name,
-                    description: data.description,
-                    category: res._id,
-                    _id: id,
-                    inKg: data.inKg,
-                    amount: data.amount
-                }
-            );
+            await product.findByIdAndUpdate(id, data)
+
             return "Record Updated"
         }
         throw new NoRecordFound()

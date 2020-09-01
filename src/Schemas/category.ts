@@ -7,6 +7,11 @@ const category = new Schema({
         required: true,
         lowercase: true
     },
+    name2: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
     hasImg:{
         type:Boolean,
         default:false

@@ -53,7 +53,6 @@ router.get('/checkForExist', async (_req: Request, res: Response) => {
 })
 
 
-
 router.put('/addAddress', async (req: Request, res: Response) => {
 
     outFunction(res, addAddress(res.locals.userId, req.body, seller))

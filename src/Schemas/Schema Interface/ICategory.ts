@@ -2,5 +2,6 @@ import { Document } from "mongoose";
 
 export interface ICategory extends Document{
     name:string,
-    hasImg:boolean
+    hasImg:boolean,
+    name2:string
 }
