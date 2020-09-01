@@ -1,5 +1,5 @@
 import { Model } from "mongoose";
-import { AlreadyExistPhoneNumber, AlredyExistError, NoRecordFound, NoUserFound } from "../../CustomExceptions/Custom_Exception";
+import { AlreadyExistPhoneNumber, AlredyExistError, NoRecordFound, NoUserAddressFound, NoUserFound } from "../../CustomExceptions/Custom_Exception";
 import IAddress from "../../Schemas/Schema Interface/IAddress";
 import ICommonProfile from "../../Schemas/Schema Interface/ICommonProfile";
 
@@ -135,7 +135,10 @@ export async function checkHasAddress(id: string, model: Model<ICommonProfile>) 
     try {
         if (await isExistWithId(id, model)) {
             let temp = await model.findOne({ _id: id }) as ICommonProfile
-            return temp.address != null
+            return {
+                'user': true,
+                'address': temp.address != null
+            }
         } else {
             throw new NoUserFound()
         }
@@ -147,7 +150,7 @@ export async function checkHasAddress(id: string, model: Model<ICommonProfile>) 
 
 export async function addAddress(id: string, data: IAddress, model: Model<ICommonProfile>) {
     try {
-        if (!(await checkHasAddress(id, model))) {
+        if (!(await checkHasAddress(id, model)).address) {
             await model.findOneAndUpdate({ _id: id }, {
                 address: data
             })
@@ -229,3 +232,5 @@ export async function getUserData(id: string, model: Model<ICommonProfile>) {
         throw error
     }
 }
+
+

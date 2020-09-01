@@ -8,7 +8,7 @@ import { sellerSctionForCart } from "../../Cart/route";
 import { outFunction } from "../../functions";
 import { sallesSectionForSeller } from "../../Salles/route";
 import { customerMinimalData } from "../Customer/route";
-import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverified, getAllData, Verifie } from "../functions";
+import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverified, getAllData, getUserData, Verifie } from "../functions";
 
 var router = Router()
 // router.use(function(req:Request,res:Response,next:NextFunction){
@@ -49,13 +49,10 @@ router.post('/create', async (req: Request, res: Response) => {
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {
-    outFunction(res, Promise.resolve(true))
-})
-
-router.get("/hasAddress", async (_req: Request, res: Response) => {
-
     outFunction(res, checkHasAddress(res.locals.userId, seller))
 })
+
+
 
 router.put('/addAddress', async (req: Request, res: Response) => {
 
@@ -65,6 +62,9 @@ router.put('/addAddress', async (req: Request, res: Response) => {
 router.get('/checkIsVerified', async (_req: Request, res: Response) => {
 
     outFunction(res, checkIsverified(res.locals.userId, seller))
+})
+router.get('/userData', async (_req: Request, res: Response) => {
+    outFunction(res, getUserData(res.locals.userId, seller))
 })
 
 export default router

@@ -12,6 +12,10 @@ var router = Router()
 //     console.log("in the route")
 //     next()
 // })
+// router.get('/:id', async (req: Request, res: Response) => {
+//     outFunction(res, checkHasAddress(req.params.id, customer))
+// })
+
 router.use(checkIfAuthenticated)
 // router.use(function(req:Request,res:Response,next:NextFunction){
 //     console.log("check auth")
@@ -30,12 +34,12 @@ router.post('/create', async (req: Request, res: Response) => {
 })
 
 router.get('/checkForExist', async (_req: Request, res: Response) => {
-    outFunction(res, Promise.resolve(true))
-})
-
-router.get("/hasAddress", async (_req: Request, res: Response) => {
     outFunction(res, checkHasAddress(res.locals.userId, customer))
 })
+
+// router.get("/hasAddress", async (_req: Request, res: Response) => {
+//     outFunction(res, checkHasAddress(res.locals.userId, customer))
+// })
 
 router.put('/addAddress', async (req: Request, res: Response) => {
     outFunction(res, addAddress(res.locals.userId, req.body, customer))

@@ -9,7 +9,16 @@ var product = new Schema<IProduct>({
         required: true,
         lowercase: true
     },
+    name2: {
+        type: String,
+        required: true,
+        lowercase: true
+    },
     description: {
+        type: String,
+        lowercase: true
+    },
+    description2: {
         type: String,
         lowercase: true
     },
@@ -29,9 +38,13 @@ var product = new Schema<IProduct>({
         type: Number,
         required: true
     },
-    hasImg:{
-        type:Boolean,
-        default:false
+    hasImg: {
+        type: Boolean,
+        default: false
+    },
+    gstIn: {
+        type: Number,
+        default: 0
     }
 })
 

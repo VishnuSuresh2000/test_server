@@ -6,6 +6,14 @@ export class NoUserFound extends Error {
     }
 }
 
+export class NoUserAddressFound extends Error {
+    constructor() {
+        super("No User Address Found")
+        this.name = "NoUserAddressFoundError"
+        Object.setPrototypeOf(this, NoUserAddressFound.prototype)
+    }
+}
+
 export class NoRecordFound extends Error {
     constructor() {
         super("No Records Found")
