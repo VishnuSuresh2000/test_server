@@ -3,13 +3,13 @@ import { paymentProgress } from '../../Schemas/CustomEnum/CartProgress'
 import Icart from '../../Schemas/Schema Interface/Icart'
 import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes'
 import { outFunction } from '../functions'
-import { addDelivaryDate, addMultiProductTobag, addProgress, checkAddOrUpdate, readCart, readCartLog, sellerCart } from './function'
+import { addAllCartToOrders, addDelivaryDate, addMultiProductTobag, addProgress, checkAddOrUpdate, readCart, readCartLog, removeCart, sellerCart } from './function'
 
 export var route = Router()
 
-route.get('/test/:id', async (req: Request, res: Response) => {
-    outFunction(res, addMultiProductTobag(req.body, req.params.id))
-})
+// route.get('/test/:id', async (req: Request, res: Response) => {
+//     outFunction(res, addMultiProductTobag(req.body, req.params.id))
+// })
 
 export function customerSectionForCart(route: Router) {
     route.get('/cart/data', async (_req: Request, res: Response) => {
@@ -29,6 +29,13 @@ export function customerSectionForCart(route: Router) {
     route.post('/cart/addMultiCart', async (req: Request, res: Response) => {
         outFunction(res, addMultiProductTobag(req.body, res.locals.userId))
     })
+    route.put('/cart/addMultiPayment', async (_req: Request, res: Response) => {
+        outFunction(res, addAllCartToOrders(res.locals.userId))
+    })
+    route.delete('/cart/removeCart', async (req: Request, res: Response) => {
+        outFunction(res, removeCart(req.body.cartId))
+    })
+
 }
 
 export function sellerSctionForCart(route: Router) {

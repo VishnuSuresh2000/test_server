@@ -11,7 +11,7 @@ import Icart from '../../Schemas/Schema Interface/Icart';
 import IProduct from '../../Schemas/Schema Interface/IProduct';
 import IProgressNote from '../../Schemas/Schema Interface/IProgressNotes';
 import ISalles from '../../Schemas/Schema Interface/ISalles';
-import { updateCount } from "../Salles/functions";
+
 
 
 
@@ -33,7 +33,11 @@ export async function readCart(customerid: string, paymentComplete: boolean) {
         let fun = async (value: Icart) => {
             var temp = value.toJSON()
             let produ = await product.findOne({ "salles._id": value.salles_id })
-                .select("salles.farmer_id salles.seller_id salles._id") as IProduct
+                .select("salles.farmer_id salles.seller_id salles._id").populate({
+                    path: "salles.seller_id",
+                    select: "firstName lastName"
+                }) as IProduct
+            console.log("Data to show ", produ.salles[0])
             temp.salles_id = produ.salles[0] as ISalles
             return await temp
         }
@@ -48,6 +52,43 @@ export async function readCart(customerid: string, paymentComplete: boolean) {
         console.log(error);
         throw error
     }
+}
+
+export async function addAllCartToOrders(customerid: string) {
+    try {
+        var totalItems: number = 0;
+        var checkFlag: string = "Payment Complted"
+        var listOferror: Array<{
+            cart: Icart,
+            error: Error
+        }> = []
+        var temp = await cart.find({
+            customer_id: customerid,
+            cancel: false, completed: false,
+            paymentComplete: false,
+        }).select('_id')
+        for (var i in temp) {
+            try {
+                let res = await payment(temp[i]._id)
+                if (res == checkFlag) {
+                    totalItems += 1
+                }
+            } catch (error) {
+                listOferror.push({
+                    cart: temp[i],
+                    error: error
+                })
+            }
+        }
+        return {
+            "payed": totalItems,
+            "error": listOferror
+        }
+    } catch (error) {
+        console.log("Error from addAllCartToOrders", error);
+        throw error
+    }
+
 }
 
 export async function readCartLog(customerid: string) {
@@ -151,22 +192,6 @@ export async function sellerCart(sellerid: string) {
     }
 }
 
-// export async function isExist(data: Icart) {
-//     try {
-//         let temp = await cart.findOne({
-//             customer_id: data.customer_id,
-//             salles_id: data.salles_id, completed: false
-//         })
-//         if (temp == null) {
-//             return false
-//         }
-//         return true
-//     } catch (error) {
-//         console.log("Error from isExist", error);
-//         throw error
-//     }
-
-// }
 
 export async function isExistForCreate(data: Icart) {
     try {
@@ -224,8 +249,13 @@ async function createCart(data: Icart) {
                 data.totalAmount = productl.amount * data.count;
                 let temp = new cart(data)
                 await temp.save()
-                changeStateSyncCart.push("true")
-                return "Added Product to Cart"
+                var isPayed = ""
+                if (data.paymentComplete) {
+                    isPayed = await payment(temp._id)
+                } else {
+                    changeStateSyncCart.push("true")
+                }
+                return `Added Product to Cart ${isPayed}`
             }
         } else {
             throw new AlredyExistError()
@@ -250,13 +280,19 @@ async function updateCountInCart(id: string, count: number, payed: boolean) {
             // console.log("total added ", (tempCart.count + count))
             // console.log("the condition ", (tempCart.count + count) > (productl.salles[0].count as number))
             if ((tempCart.count + count) <= (productl.salles[0].count as number)) {
+                var res = ""
                 await cart.findOneAndUpdate({ _id: id }, {
                     count: (tempCart.count + count),
                     totalAmount: (tempCart.count + count) * productl.amount,
-                    paymentComplete: payed,
+                    // paymentComplete: payed,
                 })
-                changeStateSyncCart.push("true")
-                return "Updated Count"
+                if (payed) {
+                    res = await payment(id)
+                } else {
+                    changeStateSyncCart.push("true")
+                }
+
+                return `Updated Count ${res}`
             } else {
                 throw new LessAmountOfProduct()
             }
@@ -272,8 +308,8 @@ async function updateCountInCart(id: string, count: number, payed: boolean) {
 
 export async function addMultiProductTobag(carts: Icart[], customerId: string) {
     var totalAdded: number = 0;
-    var addflag: string = "Added Product to Cart"
-    var updateFlag: string = "Updated Count"
+    var addflag: string = "Added Product to Cart "
+    var updateFlag: string = "Updated Count "
     var totalUpdated: number = 0
     var errorlist = Array<{ cart: Icart, error: Error }>()
     try {
@@ -351,7 +387,7 @@ export async function payment(id: string) {
                     "salles._id": temp.salles_id
                 }, {
                     '$set': {
-                        "salles.$.count": (productWithsalles.salles[0].count as number) + temp.count
+                        "salles.$.count": (productWithsalles.salles[0].count as number) - temp.count
                     }
                 })
 
@@ -373,10 +409,10 @@ export async function payment(id: string) {
     }
 }
 
-export async function removeOrder(id: string) {
+export async function removeCart(id: string) {
     try {
         if (await isExistid(id)) {
-            await addTosallesFromCart(id)
+            // await addTosallesFromCart(id)
             await cart.findByIdAndRemove(id)
             changeStateSyncCart.push("true")
             return "Product Is removed from cart"
@@ -509,5 +545,7 @@ export async function delivaryCompleted(id: string) {
         throw error
     }
 }
+
+
 
 
