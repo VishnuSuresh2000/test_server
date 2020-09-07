@@ -12,7 +12,7 @@ import invoiceTest from "./PdfGenerator/CreateInvoice";
 dbconnection()
 var wsApp=expressWs(express())
 var app = wsApp.app
-app.listen(process.env.PORT || 80, () => {
+app.listen(5000, () => {
     console.log("http://localhost:80")
 })
 
