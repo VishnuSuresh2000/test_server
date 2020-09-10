@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import checkIfAuthenticated from "../../../MiddleWare/Auth/auth";
 import checkIsAdmin from "../../../MiddleWare/Auth/CheckIsAdmin";
 import userInformation from "../../../MiddleWare/DataWares/GetProfileInformation";
@@ -11,15 +11,15 @@ import { customerMinimalData } from "../Customer/route";
 import { addAddress, addIfProfileNotExistFirebase, checkHasAddress, checkIsverified, getAllData, getUserData, Verifie } from "../functions";
 
 var router = Router()
-// router.use(function(req:Request,res:Response,next:NextFunction){
-//     console.log("request get");
-//     next()
-// })
+router.use(function(req:Request,res:Response,next:NextFunction){
+    console.log("request get");
+    next()
+})
 router.use(checkIfAuthenticated)
-// router.use(function(req:Request,res:Response,next:NextFunction){
-//     console.log("Checked auth");
-//     next()
-// })
+router.use(function(req:Request,res:Response,next:NextFunction){
+    console.log("Checked auth");
+    next()
+})
 //admin Section
 router.get('/data', checkIsAdmin, async (_req: Request, res: Response) => {
     outFunction(res, getAllData(seller))
@@ -31,17 +31,17 @@ router.put('/verifie/:id', checkIsAdmin, async (req: Request, res: Response) => 
 // seller section
 
 router.use(userInformation(seller))
-// router.use(function(req:Request,res:Response,next:NextFunction){
-//     console.log("got user");
-//     next()
-// })
+router.use(function(req:Request,res:Response,next:NextFunction){
+    console.log("got user");
+    next()
+})
 sallesSectionForSeller(router)
 sellerSctionForCart(router)
 customerMinimalData(router)
-// router.use(function(req:Request,res:Response,next:NextFunction){
-//     console.log("down salles");
-//     next()
-// })
+router.use(function(req:Request,res:Response,next:NextFunction){
+    console.log("down salles");
+    next()
+})
 router.post('/create', async (req: Request, res: Response) => {
     var data: ICommonProfile = req.body;
     data.isVerified = false;
