@@ -8,7 +8,6 @@ import { outFunction } from '../functions';
 import { addImag, addProduct, getAllProduct, getProductByCategory, readSingleProduct, updateProduct } from './functions';
 
 
-
 var storage = multer.diskStorage({
     destination: function (_req, _file, cb) {
         cb(null, 'upload/product')
