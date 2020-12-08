@@ -4,3 +4,4 @@ upload/product/*
 !upload/product/.gitkeep 
 upload/category/*
 !upload/category/.gitkeep 
+/temp 
